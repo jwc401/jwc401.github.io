@@ -1,0 +1,71 @@
+<!! THIS WAS THE index.html THAT WE ENDED UP WITH BY THE END OF CLASS
+    EXCEPT THAT I HAVE ADDED SOME COMMENTS TO THE FRAG SHADER CODE.>
+
+<script src=lib1.js></script>
+
+<body bgcolor=black>
+<center>
+<canvas id='canvas1' width='480' height='480'>
+</canvas>
+</center>
+</body>
+
+
+<!!=================================================================
+   VERTEX SHADER: runs once per triangle vertex.
+------------------------------------------------------------------->
+
+<script id='vs' type='other'>
+   attribute vec3 aPosition;
+   varying   vec3 vPosition;
+   void main() {
+      gl_Position = vec4(aPosition, 1.0);
+      vPosition = aPosition;
+   }
+</script>
+
+
+<!!=================================================================
+    FRAGMENT SHADER: runs once per pixel fragment.
+
+   Your assignment is to write your own interesting version of the
+   fragment shader program.  Try to have fun with it -- use "uTime"
+   to create animated patterns, and "uCursor" to make it responsive
+   to a user's mouse gestures.
+
+   DO NOT just hand in a variation of what I did in class!  I expect
+   you to create something original.  
+.------------------------------------------------------------------>
+
+<script id='fs' type='other'>
+   precision mediump float;
+   uniform float uTime;
+   uniform vec3  uCursor;
+   varying vec3  vPosition;
+   void main() {
+
+      // GET THE X,Y LOCATION FROM vPosition, THEN COMPUTE z AS THOUGH ON A SPHERE.
+
+      float x = vPosition.x; //vPosition X
+      float y = vPosition.y; //vPosition Y
+      float z = sqrt(1. - x * x - y * y); //Sphere computation for Z
+      
+      float mx = uCursor.x; //Mouse X position
+      float my = uCursor.y; //Mouse Y position
+
+      
+      float aX = mx * cos(uTime) - z * sin(uTime); //Color based on time and mouse's X location
+      float aY = my * cos(uTime) - z * sin(uTime); //Color based on time and mouse's Y location
+      float aZ = mx/my * sin(uTime) + z * cos(uTime); //Color based on time and mouse's X location divided by the mouse's Y location
+
+
+      gl_FragColor = vec4(aX, aY, aZ, 1.); //vec4(R, G, B, Opacity), vec4(X, Y, Z, Opacity)
+
+   }
+</script>
+
+
+<script>
+start_gl("canvas1", getStringFromScript('vs'), getStringFromScript('fs'));
+</script>
+
