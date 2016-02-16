@@ -36,35 +36,36 @@
       //Origin V
       //Ray direction W
       //Radius sph.w
-
-      vec3 D = V - sph.xyz;
-      //float D = V - sph.x * sph.y * sph.z;
-      //float D = sph.x * sph.y * sph.z;
-
-      //float r = sph.w;
-      //float t = (((-2.)*D*W) + sqrt(4.(D^2.)(W^2.)-4.(W^2.)((D^2.)-(r^2.))))/(2.*W^2.);
-
-
-      //float t = sqrt((D*D)(W*W)-(D*D)+(sph.w*sph.w)) - (D*W);
-
-
-      //float tPost, float tNeg // +/-
-
-      //float t = sqrt(((V - sph.xyz)*(V - sph.xyz))(W*W)-((V - sph.xyz)*(V - sph.xyz))+(sph.w*sph.w))-((V - sph.xyz)*W);
-      //float t = sqrt(((V - sph.xyz)*(V - sph.xyz))(W*W) - ((V - sph.xyz)*(V - sph.xyz))+(sph.w*sph.w)) - ((V - sph.xyz)*W);
       
-      //tPos = ;
-      //tNeg = ;
+      
+      //A*t^2 + B*t + C = 0
+      vec3 D = V - sph.xyz;
+      float b = 2. * dot(W, D);
+      float c = dot(D, D) - sph.w*sph.w;
 
-      float t = 0.5;
       float tPos, tNeg;
-      tPos = -(V - sph.xyz) - sph.w;
-      tNeg = sph.w - (V - sph.xyz);
+      //tPos = (sqrt((D*D)(W*W)-(D*D)+(sph.w*sph.w)) - (D*W));
+      //tNeg = -1. * (sqrt((D*D)(W*W)-(D*D)+(sph.w*sph.w)) - (D*W));
+
+      tPos = 0.5 * (sqrt(b*b - 4.*c) - b);
+      tNeg = 0.5 * (-1. * sqrt(b*b - 4.*c) - b);
 
 
-
-      if (t > 0.) { //If intersection of a ray with a sphere
-         return t; //Take the smallest positive t value
+      if (tPos > 0. || tNeg > 0.) { //If intersection of a ray with a sphere
+         if (tPos > 0. && tNeg > 0.) { //Take the smallest positive t value
+            if (tPos > tNeg) {
+               return tNeg;
+            }
+            else {
+               return tPos;
+            }
+         }
+         else if (tPos > 0. && tNeg <= 0.) {
+            return tPos;
+         }
+         else {
+            return tNeg;
+         }
       }
       else {
          return 10000.;             // RETURN THIS VALUE WHEN THE RAY MISSES THE SPHERE.
