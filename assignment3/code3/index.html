@@ -63,6 +63,12 @@
    uniform int   uNLights;   // WE ADDED THIS UNIFORM
    varying vec3  vPosition;
 
+   //Implemented uniforms
+   uniform vec4 circleSpecs; //Circle's XYZR
+
+
+
+
    // FOR EXTRA CREDIT: IMPLEMENT MULTIPLE SPHERES.
 
    vec4 sphere;
@@ -89,24 +95,27 @@
       return discr >= 0. ? (-b - sqrt(discr)) / 2. : 10000.;
    }
 
-
+   
 
    //Ambient + Diffuse + Specular = Phong Reflection
-   
    vec3 shadeSphere(vec3 point, vec4 sphere, vec3 W) {
       vec3 normal = (point - sphere.xyz) / sphere.w; //Normal N
       vec3 shade = ambient; //Ambient, soon to add the shades into it
+
+      vec3 E = -W; //Direction to the eye E
       vec3 R; //Reflection vector
-      for (int i = 0 ; i < 20 ; i++){
-         R = 2. * normal * dot(normal, uLDir[i]) - uLDir[i]; //Normal N, light source L
+
+      for (int i = 0 ; i < 20 ; i++) {
+         R = 2.0 * normal * dot(normal, uLDir[i]) - uLDir[i]; //Normal N, light source L
          if (i < uNLights) {
             //PhongReflectanceShade = Ambient + sum(lightColors[i] * (diffuse*max(0, N*lightDirection[i]) + specular*pow(max(0, E*R), p)))
-            shade += lColor[i] * (diffuse*max(0.0, dot(normal, uLDir[i])) + specular*pow(max(0.0, dot(-W, R), power)));
+            shade += lColor[i] * (diffuse * max(0.0, dot(normal, uLDir[i])) + specular * pow(max(0.0, dot(E, R)), power));
          }
+         return shade;
       }
-      return shade;
    }
    
+
 
    void main(void) {
 
@@ -118,7 +127,7 @@
       ambient = vec3(.1, .1, .1);
       diffuse = vec3(.9, .9, .9);
       specular = vec3(0.4, 0.4, 0.4);
-      power = 0.4;
+      power = 2.0;
 
       // COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL, USING vPosition.x AND vPosition.y.
       vec3 V = vec3(0., 0., 0.);
