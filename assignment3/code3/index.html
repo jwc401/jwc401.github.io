@@ -90,7 +90,9 @@
    }
 
 
+
    //Ambient + Diffuse + Specular = Phong Reflection
+   
    vec3 shadeSphere(vec3 point, vec4 sphere, vec3 W) {
       vec3 normal = (point - sphere.xyz) / sphere.w; //Normal N
       vec3 shade = ambient; //Ambient, soon to add the shades into it
@@ -99,13 +101,12 @@
          R = 2. * normal * dot(normal, uLDir[i]) - uLDir[i]; //Normal N, light source L
          if (i < uNLights) {
             //PhongReflectanceShade = Ambient + sum(lightColors[i] * (diffuse*max(0, N*lightDirection[i]) + specular*pow(max(0, E*R), p)))
-            shade += lColor[i] * (diffuse*max(0., dot(normal, uLDir[i])) + specular*pow(max(0., dot(-W, R), power)));
+            shade += lColor[i] * (diffuse*max(0.0, dot(normal, uLDir[i])) + specular*pow(max(0.0, dot(-W, R), power)));
          }
       }
-      
       return shade;
    }
-
+   
 
    void main(void) {
 
