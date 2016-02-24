@@ -28,10 +28,10 @@
    var circleVals = [0.0, 0.0, -3., 0.35]; //Maintains base circle sizes
    var lCol0 = [0.6,0.6,1.0]; //Maintains light colors
    var lCol1 = [0.15,0.15,0.06];
-   var lAmbient = [0.1, 0.1, 0.1];
-   var lDiffuse = [0.9, 0.9, 0.9];
-   var lSpecular = [0.4, 0.4, 0.4];
-   var lPower = 2.0;
+   var lAmbient = [0.1, 0.1, 0.1]; //Maintains ambient light
+   var lDiffuse = [0.9, 0.9, 0.9]; //Maintains diffused light
+   var lSpecular = [0.4, 0.4, 0.4]; //Maintains specular light
+   var lPower = 2.0; //Maintains specular light power
 
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
@@ -167,7 +167,8 @@
       specular = vec3(uSpecular.x, uSpecular.y, uSpecular.z); //Uniform specular values
       power = uPower; //Uniform power value
 
-      
+
+      //Sets the arraay of ambient light to unique ones for each sphere
       ambients[0] = vec3(uAmbient.x*sin(uTime), uAmbient.y*cos(uTime), uAmbient.z*sin(uTime));
       ambients[1] = vec3((uAmbient.x + 0.5)*sin(uTime), uAmbient.y*cos(uTime), uAmbient.z*sin(uTime));
       ambients[2] = vec3(uAmbient.x, uAmbient.y + 0.5, uAmbient.z);
