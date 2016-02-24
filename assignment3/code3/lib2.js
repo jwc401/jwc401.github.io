@@ -106,6 +106,12 @@ function gl_init(gl, vertexShader, fragmentShader) {
    gl.uTime    = gl.getUniformLocation(program, "uTime"   );
 
    gl.uCircleSpecs = gl.getUniformLocation(program, "uCircleSpecs");
+   gl.uLColor0 = gl.getUniformLocation(program, "uLColor0");
+   gl.uLColor1 = gl.getUniformLocation(program, "uLColor1");
+   gl.uAmbient = gl.getUniformLocation(program, "uAmbient");
+   gl.uDiffuse = gl.getUniformLocation(program, "uDiffuse");
+   gl.uSpecular = gl.getUniformLocation(program, "uSpecular");
+   gl.uPower = gl.getUniformLocation(program, "uPower");
 }
 
 // gl_update() is called once per animation frame.
@@ -130,6 +136,13 @@ function gl_update(gl) {
    gl.uniform1f (gl.uTime   , time);                                  // Set time uniform variable.
 
    gl.uniform4f (gl.uCircleSpecs, circleVals[0], circleVals[1], circleVals[2], circleVals[3]);
+   gl.uniform3f (gl.uLColor0 , lCol0[0], lCol0[1], lCol0[2]);
+   gl.uniform3f (gl.uLColor1 , lCol1[0], lCol1[1], lCol1[2]);
+   gl.uniform3f (gl.uAmbient , lAmbient[0], lAmbient[1], lAmbient[2]);
+   gl.uniform3f (gl.uDiffuse , lDiffuse[0], lDiffuse[1], lDiffuse[2]);
+   gl.uniform3f (gl.uSpecular , lSpecular[0], lSpecular[1], lSpecular[2]);
+   gl.uniform1f (gl.uPower , lPower);
+
 
    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);                          // Render the square.
    requestAnimFrame(function() { gl_update(gl); });                 // Start the next frame.

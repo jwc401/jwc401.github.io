@@ -25,7 +25,13 @@
    var testValue = 0;
 
 
-   var circleVals = [0.0, 0.0, -3., 0.35];
+   var circleVals = [0.0, 0.0, -3., 0.35]; //Maintains base circle sizes
+   var lCol0 = [0.6,0.6,1.0]; //Maintains light colors
+   var lCol1 = [0.15,0.15,0.06];
+   var lAmbient = [0.1, 0.1, 0.1];
+   var lDiffuse = [0.9, 0.9, 0.9];
+   var lSpecular = [0.4, 0.4, 0.4];
+   var lPower = 2.0;
 
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
@@ -45,6 +51,8 @@
 
       // THIS IS JUST A TEST VALUE THAT WE CREATED FOR PRACTICE.
       testValue = .5 + .5 * Math.sin(2 * time);
+      
+
    }
 </script>
 
@@ -68,19 +76,24 @@
 
    //Implemented uniforms
    uniform vec4 uCircleSpecs; //Circle's XYZR
-
-
+   uniform vec3 uLColor0; //Light colors
+   uniform vec3 uLColor1;
+   uniform vec3 uAmbient; //Uniform ambient
+   uniform vec3 uDiffuse; //Uniform diffuse
+   uniform vec3 uSpecular; //Uniform specular
+   uniform float uPower; //Uniform power
 
 
    // FOR EXTRA CREDIT: IMPLEMENT MULTIPLE SPHERES.
-
    vec4 sphere;
-   vec4 spheres[4];
+   vec4 spheres[4]; //Array for multiple spheres
+
 
    // ambient AND diffuse, BELOW, ARE SUFFICIENT TO CREATE ONLY DIFFUSE MATERIALS.
 
    // YOU NEED TO ADD specular AND power TO IMPLEMENT THE PHONG SHADING ALGORITHM.
    // FOR EXTRA CREDIT, YOU CAN MAKE THESE ARRAYS TO IMPLEMENT MULTIPLE MATERIALS.
+   vec3 ambients[4]; //Ambient light
 
    vec3 ambient; //Ambient light
    vec3 diffuse; //Diffused light
@@ -102,12 +115,27 @@
    
 
    //Ambient + Diffuse + Specular = Phong Reflection
-   vec3 shadeSphere(vec3 point, vec4 sphere, vec3 W) {
+   vec3 shadeSphere(vec3 point, vec4 sphere, vec3 W, int num) {
+
       vec3 normal = (point - sphere.xyz) / sphere.w; //Normal N
-      vec3 shade = ambient; //Ambient, soon to add the shades into it
+      vec3 shade; //Ambient, soon to add the shades into it
 
       vec3 E = -W; //Direction to the eye E
       vec3 R; //Reflection vector
+
+
+      if (num == 0) { //Implements the spheres with different ambients (from the ambients array)
+         shade = ambients[0];
+      }
+      else if (num == 1) {
+         shade = ambients[1];
+      }
+      else if (num == 2) {
+         shade = ambients[2];
+      }
+      else {
+         shade = ambients[3];
+      }
 
       for (int i = 0 ; i < 20 ; i++) {
          R = 2.0 * normal * dot(normal, uLDir[i]) - uLDir[i]; //Normal N, light source L
@@ -123,38 +151,58 @@
 
    void main(void) {
 
-      lColor[0] = vec3(.6,.6,1.);
-      lColor[1] = vec3(.15,.15,.06);
-
       sphere = vec4(uCircleSpecs.x, uCircleSpecs.y, uCircleSpecs.z, uCircleSpecs.w); //Sphere's XYZR values have been replaced with uniforms
       
       
-      spheres[0] = vec4(uCircleSpecs.x, uCircleSpecs.y+.5, uCircleSpecs.z, uCircleSpecs.w);
-      spheres[1] = vec4(uCircleSpecs.x, uCircleSpecs.y-.5, uCircleSpecs.z, uCircleSpecs.w);
-      spheres[2] = vec4(uCircleSpecs.x+.5, uCircleSpecs.y, uCircleSpecs.z, uCircleSpecs.w);
-      spheres[3] = vec4(uCircleSpecs.x-.5, uCircleSpecs.y, uCircleSpecs.z, uCircleSpecs.w);
+      spheres[0] = vec4(uCircleSpecs.x, (uCircleSpecs.y+.5)+0.2*cos(uTime), uCircleSpecs.z+0.2, uCircleSpecs.w);
+      spheres[1] = vec4(uCircleSpecs.x, (uCircleSpecs.y-.5)-0.2*cos(uTime), uCircleSpecs.z+0.2, uCircleSpecs.w);
+      spheres[2] = vec4((uCircleSpecs.x+.5)+0.1*sin(uTime), uCircleSpecs.y, uCircleSpecs.z, uCircleSpecs.w);
+      spheres[3] = vec4((uCircleSpecs.x-.5)-0.1*sin(uTime), uCircleSpecs.y, uCircleSpecs.z, uCircleSpecs.w);
+      lColor[0] = vec3(uLColor0.x, uLColor0.y, uLColor0.z); //Uniform light color values
+      lColor[1] = vec3(uLColor1.x, uLColor1.y, uLColor1.z);
 
 
-      ambient = vec3(.1, .1, .1);
-      diffuse = vec3(.9, .9, .9);
-      specular = vec3(0.4, 0.4, 0.4);
-      power = 2.0;
+      ambient = vec3(uAmbient.x, uAmbient.y, uAmbient.z); //Uniform ambient values
+      diffuse = vec3(uDiffuse.x, uDiffuse.y, uDiffuse.z); //Uniform diffuse values
+      specular = vec3(uSpecular.x, uSpecular.y, uSpecular.z); //Uniform specular values
+      power = uPower; //Uniform power value
+
+      
+      ambients[0] = vec3(uAmbient.x*sin(uTime), uAmbient.y*cos(uTime), uAmbient.z*sin(uTime));
+      ambients[1] = vec3((uAmbient.x + 0.5)*sin(uTime), uAmbient.y*cos(uTime), uAmbient.z*sin(uTime));
+      ambients[2] = vec3(uAmbient.x, uAmbient.y + 0.5, uAmbient.z);
+      ambients[3] = vec3(uAmbient.x*sin(uTime), uAmbient.y*cos(uTime), (uAmbient.z + 0.5)*sin(uTime));
+
 
       // COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL, USING vPosition.x AND vPosition.y.
       vec3 V = vec3(0., 0., 0.);
       vec3 W = normalize(vec3(vPosition.xy, -3.));
 
-
+      
       vec3 color = vec3(.05, .05, .05);         // BACKGROUND COLOR
+      int num = 0;
       float t = 10000.;
       for (int j=0; j<4; j++) {
          float tSpheres = raySphere(V, W, spheres[j]);
          if (tSpheres < t) {
             t = tSpheres;
+            num = j;
          }
       }
-      if (t < 10000.) {
-         color = shadeSphere(V + t * W, sphere, W); //(surface point, sphere)
+      if (t < 10000.) { 
+         if (num == 0) { //Does the different ambient color for each sphere
+            color = shadeSphere(V + t * W, sphere, W, 0); //(surface point, sphere)
+         }
+         else if (num == 1) {
+            color = shadeSphere(V + t * W, sphere, W, 1); //(surface point, sphere)
+         }
+         else if (num == 2) {
+            color = shadeSphere(V + t * W, sphere, W, 2); //(surface point, sphere)
+         }
+         else {
+            color = shadeSphere(V + t * W, sphere, W, 3); //(surface point, sphere)
+         }
+         //color = shadeSphere(V + t * W, sphere, W, num); //(surface point, sphere)
       }
 
       //color.r *= uTest; // SEE WHETHER TEST VALUE HAS BEEN PASSED CORRECTLY TO THE FRAGMENT SHADER.
