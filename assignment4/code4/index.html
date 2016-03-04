@@ -70,9 +70,9 @@
       spheres.push(lSphere1[0], lSphere1[1], lSphere1[2], lSphere1[3]);
       spheres.push(lSphere2[0], lSphere2[1], lSphere2[2], lSphere2[3]);
       //Set lAmbient values
-      var lAmbient0 = [.3, .1, .1];
-      var lAmbient1 = [.1, .1, .3];
-      var lAmbient2 = [.1, .3, .3];
+      var lAmbient0 = [.3, .3, .3];
+      var lAmbient1 = [.1, .5, .3];
+      var lAmbient2 = [.3, .3, .3];
       //Put lAmbient into ambient array
       ambients = [];
       ambients.push(lAmbient0[0], lAmbient0[1], lAmbient0[2]);
@@ -80,7 +80,7 @@
       ambients.push(lAmbient2[0], lAmbient2[1], lAmbient2[2]);
       //Set lDiffuse values
       var lDiffuse0 = [.2, .2, .2];
-      var lDiffuse1 = [.2, .2, .2];
+      var lDiffuse1 = [.2, .2, .5];
       var lDiffuse2 = [.2, .2, .2];
       //Put lDiffuse into ambient array
       diffuses = [];
@@ -236,17 +236,18 @@
 
 
 
-   bool shadowCast(vec3 V, vec3 W, int sphereNum) {
+
+   bool shadowCast(vec3 V, vec3 W, int sphereNum) { //Determines if the object is obstructed by another object thus requiring a shadow
       float shadowRay;
       for (int i=0; i<20; i++) {
          if (i != sphereNum) {
             shadowRay = raySphere(V, W, sphereSet[i]);
-            if (shadowRay < 10000. && shadowRay > 0.) {
+            if (shadowRay < 10000. && shadowRay > 0.) { //Object obstructed, shadow needed
                return true;
             }
          }
       }
-      return false;
+      return false; //Object not obstructed, no shadow needed
    }
 
 
@@ -276,6 +277,7 @@
       }
       else if (num == 1) {
          shininess = max(0., .5 + tt) * specularSet[1];
+         //shininess = specularSet[1];
       }
       else {
          shininess = max(0., .5 + tt) * specularSet[2];
@@ -287,20 +289,18 @@
       // MODULATE AMBIENT COLOR BY SOLID MARBLING TEXTURE.
       vec3 shade;
       if (num == 0) { //The first sphere, uses own ambient value
-         shade = ambientSet[0] * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
+         shade = ambientSet[0] * mix(vec3(1.,1.,1.), vec3(0.,0.,0.), texture2(p));
       }
       else if (num == 1) {
-         shade = ambientSet[1] * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
+         shade = ambientSet[1] * mix(vec3(0.0,1.0,0.5), vec3(0.3,0.5,1.0), texture2(p));
       }
       else { //The second sphere, uses own ambient value
-         shade = ambientSet[2] * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
+         shade = ambientSet[2] * mix(vec3(0.,0.,0.), vec3(1.,1.,1.), texture2(p));
       }
       //vec3 shade = ambient * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
 
 
       // LOOP THROUGH THE FIRST uNlights LIGHT SOURCES.
-      
-
       if (num == 0) { //Calculate first sphere with it's own diffuse and power values
          for (int i = 0 ; i < 20 ; i++) {
             if (i < uNLights) {
@@ -320,9 +320,6 @@
       else if (num == 1) {
          for (int i = 0 ; i < 20 ; i++) {
             if (i < uNLights) {
-               //Form shadow ray at each iteration of the loop
-               //Test that ray against every sphere in the scene to see whether there was a hit
-               //If the ray has hit any sphere in scene, then don't add in any diffuse or specular components from that light source
                if (shadowCast(point + 0.01, uLDir[0], 1)) {
                   shade = ambient;
                }
@@ -335,13 +332,7 @@
       }
       else {
          for (int i = 0 ; i < 20 ; i++) {
-            //Form shadow ray at each iteration of the loop
-            //Test that ray against every sphere in the scene to see whether there was a hit
-            //If the ray has hit any sphere in scene, then don't add in any diffuse or specular components from that light source
             if (i < uNLights) {
-               //Form shadow ray at each iteration of the loop
-               //Test that ray against every sphere in the scene to see whether there was a hit
-               //If the ray has hit any sphere in scene, then don't add in any diffuse or specular components from that light source
                if (shadowCast(point + 0.01, uLDir[0], 2)) {
                   shade = ambient;
                }
@@ -414,8 +405,9 @@
 
       int num = 0;
       float t = 10000.;
+      float tSpheres;
       for (int j=0; j<3; j++) { //Finds smallest t value for rendering
-         float tSpheres = raySphere(V, W, sphereSet[j]);
+         tSpheres = raySphere(V, W, sphereSet[j]);
          if (tSpheres < t) {
             t = tSpheres;
             num = j;
