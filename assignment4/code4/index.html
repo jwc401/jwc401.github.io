@@ -33,11 +33,8 @@
    var powers;  //Powers array
 
 
-   
-
 
    // UPDATE FUNCTION IS CALLED BY THE LIBRARY BEFORE RENDERING, ONCE PER ANIMATION FRAME.
-
    var update = function() {
 
       // AT EACH ANIMATION FRAME, COMPUTE THE LIGHT DIRECTIONS.
@@ -61,9 +58,9 @@
 
 
       //Set lsphere values
-      var lSphere0 = [Math.cos(time)*1.2, Math.cos(time)*1.2, Math.sin(time)*2.2-6.5, .4];
+      var lSphere0 = [Math.cos(time)*1.2, Math.cos(time)*1.2, Math.sin(time)-7., .4];
       var lSphere1 = [0., 0., -7., .8]; //Center sphere
-      var lSphere2 = [Math.sin(time)*1.2, Math.cos(time)*1.2, Math.sin(time)*2.6-6., .4];      
+      var lSphere2 = [Math.sin(time)*1.1, 0.0, -5.6, .4];      
       //Put lsphere into sphere array
       spheres = [];
       spheres.push(lSphere0[0], lSphere0[1], lSphere0[2], lSphere0[3]);
@@ -72,7 +69,7 @@
       //Set lAmbient values
       var lAmbient0 = [.3, .3, .3];
       var lAmbient1 = [.1, .5, .3];
-      var lAmbient2 = [.3, .3, .3];
+      var lAmbient2 = [.1, .1, .1];
       //Put lAmbient into ambient array
       ambients = [];
       ambients.push(lAmbient0[0], lAmbient0[1], lAmbient0[2]);
@@ -236,6 +233,29 @@
 
 
 
+   /*Refraction:
+      //Find theta to bend light by
+      //Ray tracing (refraction ray) inside of sphere until you hit the other side of the sphere
+      //Compute where it exits the sphere using the second root of the quadratic equation (changing neg to pos)
+      //Compute how much it refracts on the way out of the sphere
+      //Shoot ray from there and see what it hits
+   */
+   float refractSphere(vec3 point, vec3 W, vec4 sphereA, vec4 sphereB) {
+     vec3 normal = normalize((point - sphereA.xyz) / sphereA.w);
+     float reflectionIndex = 1.5; //Index of refraction, 1.5 for glass
+     float theta = asin(sin(acos(dot(W,normal)))/reflectionIndex);
+   
+     vec3 direction = vec3(dot(W,vec3(1.,0.,0.)), dot(W,vec3(0.,cos(theta),-sin(theta))), dot(W,vec3(0.,sin(theta),cos(theta))));     
+     direction = normalize(direction);
+     
+     return raySphere(point, direction, sphereB); //Checks to see if it hits the other sphere after exiting the refraction sphere
+   }
+
+
+   float refractTexture(vec3 p) { //Use this texture for the refracting sphere so that we can clearly see the refraction
+      return turbulence(p);
+   }
+
 
    bool shadowCast(vec3 V, vec3 W, int sphereNum) { //Determines if the object is obstructed by another object thus requiring a shadow
       float shadowRay;
@@ -260,10 +280,16 @@
       //vec3 shade = ambient * (1. - 10. * turbulence(5. * normal + vec3(0.,0.,uTime)));
 
       // COMPUTE GRADIENT OF "BUMPY" TEXTURE, THEN SUBTRACT THAT GRADIENT FROM NORMAL.
-      float t0 = texture(p);
-      float tx = texture(p + vec3(.01, 0., 0.));
-      float ty = texture(p + vec3(0., .01, 0.));
-      float tz = texture(p + vec3(0., 0., .01));
+      float t0;
+      float tx;
+      float ty;
+      float tz;
+      
+      t0 = texture(p);
+      tx = texture(p + vec3(.01, 0., 0.));
+      ty = texture(p + vec3(0., .01, 0.));
+      tz = texture(p + vec3(0., 0., .01));
+      
 
       normal = normalize(normal - vec3(tx-t0, ty-t0, tz-t0) / .01);
 
@@ -292,10 +318,12 @@
          shade = ambientSet[0] * mix(vec3(1.,1.,1.), vec3(0.,0.,0.), texture2(p));
       }
       else if (num == 1) {
+         //shade = ambientSet[1] * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
          shade = ambientSet[1] * mix(vec3(0.0,1.0,0.5), vec3(0.3,0.5,1.0), texture2(p));
       }
       else { //The second sphere, uses own ambient value
-         shade = ambientSet[2] * mix(vec3(0.,0.,0.), vec3(1.,1.,1.), texture2(p));
+         shade = ambientSet[2] * mix(vec3(5.,7.,8.), vec3(3.,4.,5.), refractTexture(p));
+         //shade = ambientSet[2] * mix(vec3(0.,0.,0.), vec3(1.,1.,1.), texture2(p));
       }
       //vec3 shade = ambient * mix(vec3(1.,0.,0.), vec3(0.,0.,1.), texture2(p));
 
@@ -310,9 +338,14 @@
                if (shadowCast(point + 0.01, uLDir[0], 0)) {
                   shade = ambient;
                }
-               else { 
+               else {
                   vec3 R = 2. * dot(normal, uLDir[i]) * normal - uLDir[i];
                   shade += lColor[i] * (diffuseSet[0] * max(0., dot(normal, uLDir[i])) + shininess * pow(max(0., dot(-W, R)), power));
+                  //Implementing reflection here
+                  normal = (point+0.01 - sphere.xyz) / sphere.w; //Offset the surface point S a bit
+                  normal = normalize(normal - vec3(tx-t0, ty-t0, tz-t0) / .01);
+                  vec3 W2 = 2. * dot(normal, -W) * normal - (-W); //W' = 2 (N • (-W)) N - (-W), the reflected direction ray
+                  shade += W2*pow(max(0., dot(-W, R)), power); //Mixing the result of the calculation back into the Phong equation
                }
             }
          }
@@ -364,9 +397,9 @@
       lColor[1] = vec3(.1,.1,.04);
 
       sphere = vec4(uSphere[0]); //Sphere 1 is in uSphere[0], sphere 2 is in uSphere[1]
-      sphereSet[0] = vec4(uSphere[0]);
-      sphereSet[1] = vec4(uSphere[1]);
-      sphereSet[2] = vec4(uSphere[2]);
+      sphereSet[0] = vec4(uSphere[0]); //Right leaning orbit sphere, trying to give reflection
+      sphereSet[1] = vec4(uSphere[1]); //Center sphere
+      sphereSet[2] = vec4(uSphere[2]); //Left leaning orbit sphere, trying to give refraction
 
 
       //ambient = vec3(.1, .1, .1);
@@ -405,13 +438,29 @@
 
       int num = 0;
       float t = 10000.;
+      float refractCheck0; //Ray from refraction sphere to sphere 0
+      float refractCheck1; //Ray from refraction sphere to sphere 1
+      int refractNum; //If refraction is there, checks which sphere is the one that has light bent towards it
+      float minRefractT; //Takes the smallest t value for the refractions
       float tSpheres;
-      for (int j=0; j<3; j++) { //Finds smallest t value for rendering
+      for (int j=0; j<3; j++) {
          tSpheres = raySphere(V, W, sphereSet[j]);
-         if (tSpheres < t) {
+         if (j == 2) {
+            refractCheck0 = refractSphere(V + tSpheres * W, W, sphereSet[j], sphereSet[0]); //Check if the refracting sphere refracts sphere 0
+            refractCheck1 = refractSphere(V + tSpheres * W, W, sphereSet[j], sphereSet[1]); //Checks if the refracting sphere refracts sphere 1
+         }
+         if (tSpheres < t) { //Takes the smallest t value
             t = tSpheres;
             num = j;
          }
+      }
+      if (refractCheck0 < refractCheck1) { //Finds the smaller t value amongst the two spheres being possibly refracted
+         minRefractT = refractCheck0;
+         refractNum = 0;
+      }
+      else {
+         minRefractT = refractCheck1;
+         refractNum = 1;
       }
       if (t < 10000.) { 
          if (num == 0) { //Does the different ambient color for each sphere
@@ -420,13 +469,38 @@
          else if (num == 1) {
             color = shadeSphere(V + t * W, W, sphereSet[1], 1); //(surface point, sphere)
          }
-         else {
-            color = shadeSphere(V + t * W, W, sphereSet[2], 2); //(surface point, sphere)
-         }
-         //color = shadeSphere(V + t * W, sphere, W, num); //(surface point, sphere)
+         else { //Looking through refraction sphere
+            if (minRefractT < 10000.) {
+               if (refractNum == 0) {
+                  color = (shadeSphere(V + minRefractT * W, W, sphereSet[0], 0)/2. + shadeSphere(V + t * W, W, sphereSet[2], 2));
+               }
+               else {
+                  color = (shadeSphere(V + minRefractT * W, W, sphereSet[1], 1)/2. + shadeSphere(V + t * W, W, sphereSet[2], 2));
+               }
+               //else {
+               //   color = (shadeSphere(V + minRefractT * W, W, sphereSet[2], 2)/2. + shadeSphere(V + t * W, W, sphereSet[2], 2));
+               //}
+               //color = shadeSphere(V + minRefractT * W, W, sphereSet[2], 2); //(surface point, sphere)
+            }
+            else {
+               color = (color/3. + shadeSphere(V + t * W, W, sphereSet[2], 2));
+               //color = shadeSphere(V + minRefractT * W, W, sphereSet[2], 2); //(surface point, sphere)
+            }
+         }          
       }
-
-
+      /*
+      if (num == 0) { //Does the different ambient color for each sphere
+         color = shadeSphere(V + t * W, W, sphereSet[0], 0); //(surface point, sphere)
+      }
+      else if (num == 1) {
+         color = shadeSphere(V + t * W, W, sphereSet[1], 1); //(surface point, sphere)
+      }
+      else {
+         color = shadeSphere(V + t * W, W, sphereSet[2], 2); //(surface point, sphere)
+      }
+      //color = shadeSphere(V + t * W, sphere, W, num); //(surface point, sphere)
+      */
+      
       /*
       float t = raySphere(V, W, sphere);
       if (t < 10000.)
