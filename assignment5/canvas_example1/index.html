@@ -8,9 +8,10 @@
 
 <center>
    <p>Assignment 5: </p>
-   <canvas id=canvas1 width=400 height=400>
-</canvas>
-
+   <canvas id=canvas1 width=400 height=400>   
+   </canvas>
+   <p>Click to have lightning strike!<p/>
+</center>
 
 <script src=drawlib1.js></script>
 
@@ -21,15 +22,165 @@
 
    canvas = initCanvas('canvas1');
    canvas.update = function(g) {
+
       var x = this.cursor.x,
           y = this.cursor.y;
-
       g.strokeStyle = 'black';
       g.strokeRect(1, 1, this.width-2, this.height-2);
+      g.beginPath();
+      g.rect(1, 1, this.width-2, this.height-2);
+      g.fillStyle = "darkblue";
+      g.fill(); 
+      var t = 10 * Math.sin(10 * time);
 
-      var diameter = 100 * (1 + .1 * Math.sin(time * 10));
-      g.fillStyle = this.cursor.z ? 'red' : 'rgb(0,0,128)';
-      g.fillRect(x - diameter / 2, y - diameter / 2, diameter, diameter);
+
+      //Three trees
+      g.beginPath();
+      g.rect(50, 350, 50, -50);
+      g.fillStyle = "brown";
+      g.fill();   
+      g.beginPath();
+      g.moveTo(75, 200);
+      g.lineTo(35, 220);
+      g.lineTo(50, 240);
+      g.lineTo(25, 260);
+      g.lineTo(50, 280);
+      g.lineTo(15, 300);
+      g.lineTo(135, 300);
+      g.lineTo(100, 280);
+      g.lineTo(125, 260);
+      g.lineTo(100, 240);
+      g.lineTo(115, 220);
+      g.fillStyle = "green";
+      g.fill();
+
+      g.beginPath();
+      g.rect(175, 350, 50, -50);
+      g.fillStyle = "brown";
+      g.fill();
+      g.beginPath();
+      g.moveTo(75+125, 200);
+      g.lineTo(35+125, 220);
+      g.lineTo(50+125, 240);
+      g.lineTo(25+125, 260);
+      g.lineTo(50+125, 280);
+      g.lineTo(15+125, 300);
+      g.lineTo(135+125, 300);
+      g.lineTo(100+125, 280);
+      g.lineTo(125+125, 260);
+      g.lineTo(100+125, 240);
+      g.lineTo(115+125, 220);
+      g.fillStyle = "green";
+      g.fill();
+
+      g.beginPath();
+      g.rect(300, 350, 50, -50);
+      g.fillStyle = "brown";
+      g.fill();
+      g.beginPath();
+      g.moveTo(75+250, 200);
+      g.lineTo(35+250, 220);
+      g.lineTo(50+250, 240);
+      g.lineTo(25+250, 260);
+      g.lineTo(50+250, 280);
+      g.lineTo(15+250, 300);
+      g.lineTo(135+250, 300);
+      g.lineTo(100+250, 280);
+      g.lineTo(125+250, 260);
+      g.lineTo(100+250, 240);
+      g.lineTo(115+250, 220);
+      g.fillStyle = "green";
+      g.fill();
+
+
+      //Create the lightning
+      var lightX = this.cursor.x;
+      var lightY = this.cursor.y;
+      g.strokeStyle = "yellow";
+      g.lineWidth = 10;
+
+      g.beginPath();
+      g.moveTo(x, y);
+      for (var i=1; i<10; i++) {
+         lightX += (Math.pow(-1, i)) * 50 * this.cursor.z;
+         lightY += 50 * this.cursor.z;
+         g.lineTo(lightX, lightY);
+      }
+      g.stroke();
+
+      lightX = this.cursor.x;
+      lightY = this.cursor.y;
+      g.beginPath();
+      g.moveTo(x, y);
+      for (var i=1; i<10; i++) {
+         lightX += (Math.pow(-1, i)) * 50 * this.cursor.z;
+         lightY -= 50 * this.cursor.z;
+         g.lineTo(lightX, lightY);
+      }
+      g.stroke();
+
+   
+      g.beginPath();
+      g.rect(x-110, 330, (200 + t) * this.cursor.z, 25 * this.cursor.z);
+      g.fillStyle = "yellow";
+      g.fill();
+      g.beginPath();
+      g.moveTo((x-75 + t)  * this.cursor.z, (350 + t)  * this.cursor.z);
+      g.lineTo((x+75 + t)  * this.cursor.z, (300 + t)  * this.cursor.z);
+      g.stroke();
+      g.beginPath();
+      g.moveTo((x+25 + t)  * this.cursor.z, (350 + t)  * this.cursor.z);
+      g.lineTo((x-100 + t)  * this.cursor.z, (300 + t)  * this.cursor.z);
+      g.stroke();
+      g.beginPath();
+      g.moveTo((x+25 + t)  * this.cursor.z, (350 + t)  * this.cursor.z);
+      g.lineTo((x-100 + t)  * this.cursor.z, (275 + t)  * this.cursor.z);
+      g.stroke();
+      g.beginPath();
+      g.moveTo((x-75  + t)  * this.cursor.z, (350 + t)  * this.cursor.z);
+      g.lineTo((x+75 + t)  * this.cursor.z, (275 + t)  * this.cursor.z);
+      g.stroke();
+   
+
+      //Create the ground
+      g.beginPath();
+      g.rect(0, 350, 400, 50);
+      g.fillStyle = "grey";
+      g.fill();
+
+
+      //Create and animate the person
+      t = 170 * Math.sin(time);
+      g.fillStyle = "black";
+      g.strokeStyle = "black";
+      g.beginPath();
+      g.arc(200 + t,280 - (10 * this.cursor.z),10,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.moveTo(200 + t, 280 - (10 * this.cursor.z));
+      g.lineTo(200 + t, 320 - (10 * this.cursor.z));
+      g.stroke();
+
+      g.beginPath();
+      g.moveTo(200 + t, 290 - (10 * this.cursor.z));
+      g.lineTo(185 + t, 325 - (10 * this.cursor.z));
+      g.stroke();
+
+      g.beginPath();
+      g.moveTo(200 + t, 290 - (10 * this.cursor.z));
+      g.lineTo(215 + t, 325 - (10 * this.cursor.z));
+      g.stroke();
+
+      g.beginPath();
+      g.moveTo(200 + t, 320 - (10 * this.cursor.z));
+      g.lineTo(190 + t, 350 - (10 * this.cursor.z));
+      g.stroke();
+
+      g.beginPath();
+      g.moveTo(200 + t, 320 - (10 * this.cursor.z));
+      g.lineTo(210 + t, 350 - (10 * this.cursor.z));
+      g.stroke();
+
    }
 
 </script>
