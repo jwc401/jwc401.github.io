@@ -1,0 +1,75 @@
+
+<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
+<big>HTML5 Canvas Reference is here</big></a></b>
+
+<!! THIS IS AN EXAMPLE OF A HOMEWORK DOCUMENT THAT CONTAINS CANVAS BASED GRAPHICS.
+    YOU SHOULD CHANGE THE TEXT BELOW TO SOMETHING THAT DESCRIBES YOUR OWN WORK.>
+
+<p>
+Here is my next cool homework, and this is my even more excellent example:
+<p>
+
+<center>
+<table>
+<tr>
+<td>
+<center>
+<canvas id=canvas1 width=600 height=400></canvas>
+<p>
+
+<i>This is how I show off my cool Matrix class.</i>
+
+</center>
+</td>
+</tr>
+</table>
+<p>
+</center>
+<p>
+
+<script src=utility.js></script>
+<script src=drawlib1.js></script>
+<script src=matrix.js></script>
+
+<script>
+   var canvas;
+
+
+   // BELOW IS THE CODE WE WROTE ON THURSDAY TO TEST THE MATRIX CLASS.
+   // YOU NEED TO FINISH IMPLEMENTING THE MATRIX CLASS, AND THEN
+   // CREATE AN ANIMATED GRAPHICAL SCENE TO DEMONSTRATE YOUR WORK.
+   // YOU SHOULD USE BOTH THE time AND this.cursor VARIABLES.
+
+   var matrix = new Matrix();
+
+   matrix.identity();
+   matrix.translate(1, 0, 0);
+   matrix.translate(2, 3, 0);
+
+   console.log(matrix.toString());
+
+   var srcVec = new Vector3(10, 0, 0);
+   var dstVec = new Vector3(0, 0, 0);
+   matrix.transform(srcVec, dstVec);
+   console.log(dstVec.toString());
+   
+   /////////////////////////////////////////////////////////////////////
+
+
+   canvas = initCanvas('canvas1');
+   canvas.update = function(g) {
+
+      // YOU ARE GOING TO REPLACE THE CODE BELOW.
+
+      var x = this.cursor.x,
+          y = this.cursor.y;
+
+      g.strokeStyle = 'black';
+      g.strokeRect(1, 1, this.width-2, this.height-2);
+
+      var diameter = 100 * (1 + .1 * Math.sin(time * 10));
+      g.fillStyle = this.cursor.z ? 'red' : 'rgb(0,0,128)';
+      g.fillRect(x - diameter / 2, y - diameter / 2, diameter, diameter);
+   }
+</script>
+
