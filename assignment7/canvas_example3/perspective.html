@@ -1,0 +1,100 @@
+
+<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
+<big>HTML5 Canvas Reference is here</big></a></b>
+
+<p>
+<p>
+
+<center>
+<table>
+<tr>
+<td>
+<center>
+<canvas id=canvas1 width=400 height=400></canvas>
+<p>
+
+<i></i>
+
+</center>
+</td>
+</tr>
+</table>
+<p>
+</center>
+<p>
+
+<script src=utility.js></script>
+<script src=drawlib1.js></script>
+<script src=matrix.js></script>
+
+<script>
+   var canvas;
+
+   var matrix = new Matrix();
+
+   var pt0 = new Vector3(-1, 0, 0);
+   var pt1 = new Vector3( 1, 0, 0);
+   var tmp = new Vector3( 0, 0, 0);
+
+   var pix0 = new Vector3(0, 0, 0);
+   var pix1 = new Vector3(0, 0, 0);
+
+   function moveTo(x, y, z) {
+      pt0.set(x, y, z);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.moveTo(pix0.x, pix0.y);
+   }
+
+   function lineTo(x, y, z) {
+      pt0.set(x, y, z);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.lineTo(pix0.x, pix0.y);
+   }
+
+   var g;
+   var width;
+   var height;
+
+   canvas = initCanvas('canvas1');
+   canvas.update = function(_g) {
+      g = _g;
+      width = canvas.width;
+      height = canvas.height;
+
+      // OUTLINE AROUND CANVAS
+
+      g.lineWidth = 2;
+      g.strokeStyle = 'black';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(width, 0);
+      g.lineTo(width, height);
+      g.lineTo(0, height);
+      g.lineTo(0, 0);
+      g.stroke();
+
+      matrix.identity();
+      matrix.scale(.3);
+      matrix.perspective(.1 * Math.sin(10 * time), 0, 0);
+
+      g.beginPath();
+
+      moveTo(-1,-1, 0);
+      lineTo( 1,-1, 0);
+      lineTo( 1, 1, 0);
+      lineTo(-1, 1, 0);
+      lineTo(-1,-1, 0);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+      g.lineWidth = 20;
+      g.strokeStyle = 'black';
+      g.stroke();
+      g.lineWidth = 16;
+      g.strokeStyle = 'rgb(200,200,200)';
+      g.stroke();
+   }
+</script>
+

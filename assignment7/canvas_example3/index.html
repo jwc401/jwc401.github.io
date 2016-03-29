@@ -1,0 +1,195 @@
+<p> ASSIGNMENT 7: </p>
+
+<blockquote>
+<table cellspacing=10>
+<tr><td><a href=flapping.html>flapping.html</td>
+    <td>// FLAPPING</a></td></tr>
+<tr><td><a href=running.html>running.html</td>
+    <td>// RUNNING</a></td></tr>
+<tr><td><a href=perspective.html>perspective.html</td>
+    <td>// ONE SQUARE WITH X PERSPECTIVE</a></td></tr>
+<tr><td><a href=squares.html>squares.html</td>
+    <td>// TWO SQUARES WITH Z PERSPECTIVE</a></td></tr>
+</table>
+</blockquote>
+
+
+<center>
+<table>
+<tr>
+<td>
+<center>
+<canvas id=canvas1 width=600 height=400></canvas>
+<p>
+
+<i>
+INSERT INFO HERE
+</i>
+
+</center>
+</td>
+</tr>
+</table>
+<p>
+</center>
+<p>
+
+<script src=utility.js></script>
+<script src=drawlib1.js></script>
+<script src=matrix.js></script>
+
+<script>
+	var canvas;
+
+	var matrix = new Matrix();
+
+	var pt0 = new Vector3(-1, 0, 0);
+	var pt1 = new Vector3( 1, 0, 0);
+	var tmp = new Vector3( 0, 0, 0);
+
+	var pix0 = new Vector3(0, 0, 0);
+	var pix1 = new Vector3(0, 0, 0);
+
+	function moveTo(x, y, z) {
+		pt0.set(x, y, z);
+		matrix.transform(pt0, tmp);
+		tmp.viewportTransform(width/2, height, pix0);
+		g.moveTo(pix0.x, pix0.y);
+	}	
+
+	function lineTo(x, y, z) {
+		pt0.set(x, y, z);
+		matrix.transform(pt0, tmp);
+		tmp.viewportTransform(width/2, height, pix0);
+		g.lineTo(pix0.x, pix0.y);
+	}
+
+	var g;
+	var width;
+	var height;
+	var click; //Detects mouse click
+
+	canvas = initCanvas('canvas1');
+	canvas.update = function(_g) {
+		g = _g;
+		width = canvas.width;
+		height = canvas.height;
+		click = this.cursor.z;
+		var modClick = click * 0.5;
+
+		// OUTLINE AROUND CANVAS
+		g.lineWidth = 2;
+		g.strokeStyle = 'black';
+		g.beginPath();
+		g.moveTo(0, 0);
+		g.lineTo(width, 0);
+		g.lineTo(width, height);
+		g.lineTo(0, height);
+		g.lineTo(0, 0);
+		g.stroke();
+
+
+		//The persons head and torso
+		g.beginPath();
+		g.arc(150,95,30,0,2*Math.PI);
+		g.stroke();
+		g.fill();
+		g.fillRect(140, 75, 20, 165);
+
+
+		//The persons arms
+		for (var side = -1 ; side <= 1 ; side += 2) { //For left and right side
+			var rate = 1.5 * (2 * Math.PI); //Running rate
+			var angle0 = 0.2 * Math.sin(rate * time); //Controls shoulder
+			var angle1 =  -0.9 * Math.cos(rate * time); //Controls upper arm
+			var angle2 = -0.9 * (-side + Math.sin(rate * time)); //Controls lower arm
+
+			matrix.identity();
+			matrix.rotateY(time*click);
+
+			g.lineJoin = 'round';
+			g.lineCap = 'round';
+			g.beginPath();
+
+			matrix.translate(0, .33, 0);
+
+			moveTo( 0, 0, 0);
+			matrix.rotateX(.5 * angle0);
+
+			matrix.translate(0, 0, .2 * side); //Shoulder
+
+			lineTo( 0, 0, 0);
+			matrix.rotateX(-.5 * angle0);
+			
+			matrix.rotateZ((-Math.PI/2 + angle1) * side + modClick*15);
+			matrix.translate( .35 * side, 0, 0); //Upper arm
+
+			lineTo( 0, 0, 0);
+			
+			matrix.rotateZ(angle2 * side);
+			matrix.translate( .3 * side, 0, 0); //Forearms
+
+			lineTo( 0, 0, 0);
+
+			//Hands
+			matrix.rotateZ(0.1 * angle2 * side);
+			matrix.translate(0, .01 * side, 0);
+			lineTo( 0, 0, 0);
+
+			g.lineWidth = 20;
+			g.strokeStyle = 'black';
+			g.stroke();
+		}
+
+
+		//The persons legs
+		for (var side = -1 ; side <= 1 ; side += 2) { //For left and right side
+			var rate = 1.5 * (2 * Math.PI); //Running rate
+			var angle0 = -.3 * Math.sin(rate * time); //Controls hip
+			var angle1 =  .7 * Math.cos(rate * time); //Controls upper leg
+			var angle2 = .7 * (-side + Math.sin(rate * time)); //Controls lower leg
+
+			matrix.identity();
+			matrix.rotateY(time*click);
+
+			g.lineJoin = 'round';
+			g.lineCap = 'round';
+			g.beginPath();
+
+
+			//matrix.rotateZ(.5 * angle2 * side);
+			//matrix.translate(0, .1 * side, 0);
+			//lineTo( 0, 0, 0);
+
+			matrix.translate(0, -.18, 0);
+
+			moveTo( 0, 0, 0);
+			matrix.rotateX(.5 * angle0);
+
+			matrix.translate(0, 0, .12 * side);
+
+			lineTo( 0, 0, 0);
+			matrix.rotateX(-.5 * angle0);
+
+			matrix.rotateZ((-Math.PI/2 + angle1) * side);
+			matrix.translate( .4 * side, 0, 0);
+
+			lineTo( 0, 0, 0);
+
+			matrix.rotateZ(angle2 * side);
+			matrix.translate( .4 * side, 0, 0);
+
+			lineTo( 0, 0, 0);
+
+			matrix.rotateZ(.5 * angle2 * side);
+			matrix.translate(0, .1 * side, 0);
+
+			lineTo( 0, 0, 0);
+
+			g.lineWidth = 20;
+			g.strokeStyle = 'black';
+			g.stroke();
+		}
+	}
+</script>
+

@@ -7,6 +7,8 @@ function Matrix() {
 
 Matrix.prototype = {
 
+   //////////////////////// PUBLIC METHODS ////////////////////////////
+
    toGPUMatrix : function(dst) {
       var row, col;
       for (row = 0 ; row < 4 ; row++)
@@ -33,8 +35,14 @@ Matrix.prototype = {
       dst.x = A[0][0] * x + A[0][1] * y + A[0][2] * z + A[0][3] * w;
       dst.y = A[1][0] * x + A[1][1] * y + A[1][2] * z + A[1][3] * w;
       dst.z = A[2][0] * x + A[2][1] * y + A[2][2] * z + A[2][3] * w;
+      w     = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
       if (dst.w !== undefined)
-         dst.w = A[3][0] * x + A[3][1] * y + A[3][2] * z + A[3][3] * w;
+         dst.w = w;
+      else {
+	 dst.x /= w;
+	 dst.y /= w;
+	 dst.z /= w;
+      }
    },
 
    identity : function() {
@@ -46,50 +54,33 @@ Matrix.prototype = {
       this._multiply(this._tmp1);
    },
 
-
-   //Make rotate functions for xyz coordinates and  scaling function
-
-   rotateX : function(angle) {
-      this._makeIdentity(this._tmp1); 
-      this._tmp1[1][1] = Math.cos(angle); 
-      this._tmp1[1][2] = -Math.sin(angle);
-      this._tmp1[2][1] = Math.sin(angle); 
-      this._tmp1[2][2] = Math.cos(angle); 
-      this._multiply(this._tmp1); 
-   },
-
-   rotateY : function(angle) {
-      this._makeIdentity(this._tmp1); 
-      this._tmp1[0][0] = Math.cos(angle); 
-      this._tmp1[0][2] = Math.sin(angle); 
-      this._tmp1[2][0] = -Math.sin(angle); 
-      this._tmp1[2][2] = Math.cos(angle); 
-      this._multiply(this._tmp1); 
-   },
-
-   rotateZ : function(angle) {
-      this._makeIdentity(this._tmp1); 
-      this._tmp1[0][0] = Math.cos(angle); 
-      this._tmp1[0][1] = -Math.sin(angle);
-      this._tmp1[1][0] = Math.sin(angle);
-      this._tmp1[1][1] = Math.cos(angle); 
+   perspective : function(x, y, z) {
+      this._makePerspective(this._tmp1, x, y, z);
       this._multiply(this._tmp1);
    },
 
-   scale : function(scaleX, scaleY, scaleZ) {
-      this._makeIdentity(this._tmp1); 
-      this._tmp1[0][0] = scaleX; 
-      this._tmp1[1][1] = scaleY;
-      this._tmp1[2][2] = scaleZ;
+   rotateX : function(theta) {
+      this._makeRotation(this._tmp1, theta, 1, 2);
       this._multiply(this._tmp1);
    },
 
-   //Optional perspective function
-   //perspective: function() {
-   //   
-   //}
+   rotateY : function(theta) {
+      this._makeRotation(this._tmp1, theta, 2, 0);
+      this._multiply(this._tmp1);
+   },
 
-   //////////////////////// INTERNAL METHODS ////////////////////////////
+   rotateZ : function(theta) {
+      this._makeRotation(this._tmp1, theta, 0, 1);
+      this._multiply(this._tmp1);
+   },
+
+   scale : function(x, y, z) {
+      if (y === undefined) z = y = x;
+      this._makeScale(this._tmp1, x, y, z);
+      this._multiply(this._tmp1);
+   },
+
+   //////////////////////// "INTERNAL" METHODS ////////////////////////////
 
    _makeIdentity : function(dst) {
       var row, col;
@@ -105,24 +96,41 @@ Matrix.prototype = {
       dst[2][3] = z;
    },
 
-   //Make multiply method
-   _multiply : function(src) {
-      var A = this._data, B = src, row, col;
-      for (row = 0 ; row < 4 ; row++) {
-         for (col = 0 ; col < 4 ; col++) {
-            this._tmp2[row][col] = A[row][0] * B[0][col] + A[row][1] * B[1][col] + A[row][2] * B[2][col] + A[row][3] * B[3][col];
-         }
-      }
-      for (row = 0 ; row < 4 ; row++) {
-         for (col = 0 ; col < 4 ; col++) {
-            this._data[row][col] = this._tmp2[row][col];
-         }
-      }
+   _makePerspective : function(dst, x, y, z) {
+      this._makeIdentity(dst);
+      dst[3][0] = x;
+      dst[3][1] = y;
+      dst[3][2] = z;
    },
 
-   //Optional make scale function
-   //_makeScale : function() {
-   //
-   //}
+   _makeRotation : function(dst, theta, a, b) {
+      this._makeIdentity(dst);
+      var c = Math.cos(theta);
+      var s = Math.sin(theta);
+      dst[a][a] =  c;
+      dst[a][b] = -s;
+      dst[b][a] =  s;
+      dst[b][b] =  c;
+   },
+
+   _makeScale : function(dst, x, y, z) {
+      this._makeIdentity(dst);
+      dst[0][0] = x;
+      dst[1][1] = y;
+      dst[2][2] = z;
+   },
+
+   _multiply : function(src) {
+      var A = this._data, B = src, row, col;
+      for (row = 0 ; row < 4 ; row++)
+         for (col = 0 ; col < 4 ; col++)
+	    this._tmp2[row][col] = A[row][0] * B[0][col] +
+				   A[row][1] * B[1][col] +
+	                           A[row][2] * B[2][col] +
+	                           A[row][3] * B[3][col] ;
+      for (row = 0 ; row < 4 ; row++)
+         for (col = 0 ; col < 4 ; col++)
+	    this._data[row][col] = this._tmp2[row][col];
+   },
 }
 

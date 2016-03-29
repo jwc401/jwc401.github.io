@@ -1,0 +1,122 @@
+
+<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
+<big>HTML5 Canvas Reference is here</big></a></b>
+
+<p>
+<p>
+
+<center>
+<table>
+<tr>
+<td>
+<center>
+<canvas id=canvas1 width=400 height=400></canvas>
+<p>
+
+<i></i>
+
+</center>
+</td>
+</tr>
+</table>
+<p>
+</center>
+<p>
+
+<script src=utility.js></script>
+<script src=drawlib1.js></script>
+<script src=matrix.js></script>
+
+<script>
+   var canvas;
+
+   var matrix = new Matrix();
+
+   var pt0 = new Vector3(-1, 0, 0);
+   var pt1 = new Vector3( 1, 0, 0);
+   var tmp = new Vector3( 0, 0, 0);
+
+   var pix0 = new Vector3(0, 0, 0);
+   var pix1 = new Vector3(0, 0, 0);
+
+   function moveTo(x, y, z) {
+      pt0.set(x, y, z);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.moveTo(pix0.x, pix0.y);
+   }
+
+   function lineTo(x, y, z) {
+      pt0.set(x, y, z);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.lineTo(pix0.x, pix0.y);
+   }
+
+   var g;
+   var width;
+   var height;
+
+   canvas = initCanvas('canvas1');
+   canvas.update = function(_g) {
+      g = _g;
+      width = canvas.width;
+      height = canvas.height;
+
+      // OUTLINE AROUND CANVAS
+
+      g.lineWidth = 2;
+      g.strokeStyle = 'black';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(width, 0);
+      g.lineTo(width, height);
+      g.lineTo(0, height);
+      g.lineTo(0, 0);
+      g.stroke();
+
+for (var side = -1 ; side <= 1 ; side += 2) {
+      var rate = 1.5 * (2 * Math.PI);
+      var angle0 = -.5 * Math.sin(rate * time);
+      var angle1 =  .5 * Math.cos(rate * time);
+      var angle2 = .7 * (-side + Math.sin(rate * time));
+
+      matrix.identity();
+      matrix.rotateY(time);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+      g.beginPath();
+
+      matrix.translate(0, -.18, 0);
+
+      moveTo( 0, 0, 0);
+      matrix.rotateX(.5 * angle0);
+
+      matrix.translate(0, 0, .12 * side);
+
+      lineTo( 0, 0, 0);
+      matrix.rotateX(-.5 * angle0);
+
+      matrix.rotateZ((-Math.PI/2 + angle1) * side);
+      matrix.translate( .4 * side, 0, 0);
+
+      lineTo( 0, 0, 0);
+
+      matrix.rotateZ(angle2 * side);
+      matrix.translate( .4 * side, 0, 0);
+
+      lineTo( 0, 0, 0);
+
+      matrix.rotateZ(.5 * angle2 * side);
+      matrix.translate(0, .1 * side, 0);
+
+      lineTo( 0, 0, 0);
+
+      g.lineWidth = 20;
+      g.strokeStyle = 'black';
+      g.stroke();
+}
+   }
+</script>
+

@@ -1,14 +1,4 @@
 
-<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
-<big>HTML5 Canvas Reference is here</big></a></b>
-
-<!! THIS IS AN EXAMPLE OF A HOMEWORK DOCUMENT THAT CONTAINS CANVAS BASED GRAPHICS.
-    YOU SHOULD CHANGE THE TEXT BELOW TO SOMETHING THAT DESCRIBES YOUR OWN WORK.>
-
-<p>
-Here is my next cool homework, and this is my even more excellent example:
-<p>
-
 <center>
 <table>
 <tr>
@@ -17,7 +7,10 @@ Here is my next cool homework, and this is my even more excellent example:
 <canvas id=canvas1 width=600 height=400></canvas>
 <p>
 
-<i>This is how I show off my cool Matrix class.</i>
+<i>This explores using matrices to simulate 3D effects on a 2D canvas. You can see here that at the base of the loop, the squares are clearly shown to be alligned on the canvas in a grid-like fashion. As the animation progresses however, the matrix rotations and transformations to the squares makes it seem like some of the squares are in the foreground and others are in the background, giving the illusion of 3D whilst still being in 2D.
+
+This effect can be further seen by moving around the mouse within the canvas, controlling the three squares that are interlayered between the matrix operationed squares. Click and hold to change up the animation!
+</i>
 
 </center>
 </td>
@@ -61,15 +54,171 @@ Here is my next cool homework, and this is my even more excellent example:
 
       // YOU ARE GOING TO REPLACE THE CODE BELOW.
 
-      var x = this.cursor.x,
-          y = this.cursor.y;
+      var cursorX = this.cursor.x;
+      var cursorY = this.cursor.y;
 
       g.strokeStyle = 'black';
       g.strokeRect(1, 1, this.width-2, this.height-2);
 
-      var diameter = 100 * (1 + .1 * Math.sin(time * 10));
-      g.fillStyle = this.cursor.z ? 'red' : 'rgb(0,0,128)';
-      g.fillRect(x - diameter / 2, y - diameter / 2, diameter, diameter);
+      
+
+
+      var t = Math.sin(time) + (this.cursor.z);
+
+      square = function(startX, startY) {
+         var matrix = new Matrix();
+         var src = new Vector3(0,0,0);
+         var dst = new Vector3(0,0,0);
+         var view = new Vector3(1,1,1);
+         matrix.identity();
+
+         g.beginPath();
+         g.fillStyle = "blue";
+         g.strokeStyle = "black";
+         matrix.translate(startX,startY,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.moveTo(view.x,view.y);
+         //matrix.scale(Math.sin(0.5 * time), Math.sin(0.5 * time), Math.sin(0.5 * time));
+         matrix.rotateX(45 * (0.1*t));
+         //matrix.rotateY(45 * (0.1*t));
+         matrix.translate(0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(-0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+               
+         g.stroke();
+         g.fill();
+      }
+      squareA = function(startX, startY) {
+         var matrix = new Matrix();
+         var src = new Vector3(0,0,0);
+         var dst = new Vector3(0,0,0);
+         var view = new Vector3(1,1,1);
+         matrix.identity();
+
+         g.beginPath();
+         g.fillStyle = "red";
+         g.strokeStyle = "black";
+         matrix.translate(startX,startY,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.moveTo(view.x,view.y);
+         //matrix.scale(Math.sin(0.5 * time), Math.sin(0.5 * time), Math.sin(0.5 * time));
+         matrix.rotateX(45 * (0.1*t));
+         matrix.rotateY(45 * (0.1*t));
+         matrix.translate(0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(-0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+               
+         g.stroke();
+         g.fill();
+      }
+      squareB = function(startX, startY) {
+         var matrix = new Matrix();
+         var src = new Vector3(0,0,0);
+         var dst = new Vector3(0,0,0);
+         var view = new Vector3(1,1,1);
+         matrix.identity();
+
+         g.beginPath();
+         g.fillStyle = "green";
+         g.strokeStyle = "black";
+         matrix.translate(startX,startY,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.moveTo(view.x,view.y);
+         matrix.scale(1, -1, 1);
+         //matrix.rotateX(45);
+         //matrix.rotateZ(45 * (0.1*time));
+         matrix.rotateX(15 * (0.1*t));
+         matrix.rotateZ(45 * (0.1*t*t));
+         //matrix.rotateX(45* (0.1*t));
+         //matrix.rotateZ(30 * ((0.1*t)*(0.1*t)));
+         matrix.translate(0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(-0.5,0.0,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+         
+         g.lineTo(view.x,view.y);
+         matrix.translate(0.0,0.5,0);
+         matrix.transform(src,dst);
+         dst.viewportTransform(canvas.width,canvas.height,view);
+               
+         g.stroke();
+         g.fill();
+      }  
+
+   
+
+      squareB(0.3, 0.0);
+      squareB(0.3, 0.5);
+      var diameter = 100 * (1 + .1 * t * 5 * this.cursor.z/5);
+      g.fillStyle = this.cursor.z ? 'orange' : 'rgb(0,0,128)';
+      g.fillRect(cursorX - diameter / 2 - 120, cursorY - diameter / 2, diameter, diameter);      
+      squareA(0.8, 0.0);
+      squareA(0.3, 0.0);
+      square(0.3, 0.0);
+
+
+      var diameter = 100 * (1 + .1 * t * 5 * this.cursor.z/5);
+      g.fillStyle = this.cursor.z ? 'orange' : 'rgb(0,0,128)';
+      g.fillRect(cursorX - diameter / 2, cursorY - diameter / 2, diameter, diameter);
+
+
+      squareB(-0.5, 0.0);
+      squareB(-0.5, 0.5);
+      var diameter = 100 * (1 + .1 * t * 5 * this.cursor.z/5);
+      g.fillStyle = this.cursor.z ? 'orange' : 'rgb(0,0,128)';
+      g.fillRect(cursorX - diameter / 2 + 120, cursorY - diameter / 2, diameter, diameter);
+      squareA(0.0, 0.0);
+      squareA(-0.5, 0.0);
+      square(-0.5, 0.0);
+
+
+
    }
+
 </script>
 
