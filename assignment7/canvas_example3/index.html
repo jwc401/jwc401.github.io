@@ -23,7 +23,7 @@
 <p>
 
 <i>
-INSERT INFO HERE
+Animation of a guy running during a sunny day in a field that has two dead trees. Press the left/right arrow keys to make the running man shift in the respective directions. Press the up/down keys to make the running man move closer/further from the screen (perspective). Hold and click to make the running man run in a circle. Press the space bar to reset the position of the running man.
 </i>
 
 </center>
@@ -67,7 +67,30 @@ INSERT INFO HERE
 	var g;
 	var width;
 	var height;
+
 	var click; //Detects mouse click
+	var xKeyVal = 0; //Arrow key affecting x axis
+	var zKeyVal = 0; //Arrow key affecting z axis
+	document.onkeydown = function(e) {
+	    switch (e.keyCode) { //Detect arrow key presses
+	    	case 32: //Spacebar
+	    		xKeyVal = 0;
+	    		zKeyVal = 0;
+	    		break;
+	        case 37: //Left
+	            xKeyVal = -1;
+	            break;
+	        case 38: //Up
+	            zKeyVal = 1;
+	            break;
+	        case 39: //Right
+	            xKeyVal = 1;
+	            break;
+	        case 40: //Down
+	            zKeyVal = -1;
+	            break;
+    }
+};
 
 	canvas = initCanvas('canvas1');
 	canvas.update = function(_g) {
@@ -75,7 +98,7 @@ INSERT INFO HERE
 		width = canvas.width;
 		height = canvas.height;
 		click = this.cursor.z;
-		var modClick = click * 0.5;
+		var modClick = click / 2;
 
 		// OUTLINE AROUND CANVAS
 		g.lineWidth = 2;
@@ -88,14 +111,100 @@ INSERT INFO HERE
 		g.lineTo(0, 0);
 		g.stroke();
 
+		
 
-		//The persons head and torso
+		//Sets up the background
+		g.fillStyle = "lightblue";
+		g.fillRect(0, 0, 600, 200);
+		g.fillStyle = "green";
+		g.fillRect(0, 200, 600, 400);
+
+		//Sun
 		g.beginPath();
-		g.arc(150,95,30,0,2*Math.PI);
+		g.arc(0,0,40+10*Math.sin(time),0,2*Math.PI);
+		g.strokeStyle = "yellow";
+		g.fillStyle = "yellow";
 		g.stroke();
 		g.fill();
-		g.fillRect(140, 75, 20, 165);
 
+		//Tree 1
+		matrix.identity();
+		g.stroke();
+		g.beginPath();
+		matrix.scale(0.3);
+		matrix.translate(-0.5, 0.5, -0.5);
+		moveTo(-.2,-.8, 0);
+		lineTo( .2,-.8, 0);
+		lineTo( .2, .8, 0);
+		lineTo(-.2, .8, 0);
+		lineTo(-.2,-.8, 0);
+		g.strokeStyle = "brown";
+		g.fillStyle = "brown";
+		g.lineWidth = 10;
+		g.stroke();
+		g.fill();
+
+		//Tree 2
+		matrix.identity();
+		g.stroke();
+		g.beginPath();
+		matrix.scale(0.6);
+		matrix.translate(3.0, 0.5, -0.5);
+		moveTo(-.2,-.8, 0);
+		lineTo( .2,-.8, 0);
+		lineTo( .2, .8, 0);
+		lineTo(-.2, .8, 0);
+		lineTo(-.2,-.8, 0);
+		g.strokeStyle = "brown";
+		g.fillStyle = "brown";
+		g.lineWidth = 10;
+		g.stroke();
+		g.fill();
+
+
+
+		/*****THE RUNNING MAN*****/
+		//The persons head
+		matrix.identity();
+		matrix.perspective(0, 0, 0+0.5*zKeyVal);
+		matrix.rotateY(1);
+		matrix.rotateY(time*click);
+		g.stroke();
+		g.beginPath();
+		matrix.translate(1.0 + xKeyVal/2, 0.7, 0.2);
+		moveTo(-.2,-.2, 0);
+		lineTo( .2,-.2, 0);
+		lineTo( .2, .2, 0);
+		lineTo(-.2, .2, 0);
+		lineTo(-.2,-.2, 0);
+		lineTo(-.2, -.2, -.4);
+		lineTo(-.2, .2, -.4);
+		lineTo(-.2, .2, 0);
+		lineTo(-.2, .2, -.4);
+		lineTo(.2, .2, -.4);
+		lineTo(.2, .2, 0);
+		lineTo(.2, .2, -.4);
+		lineTo(.2, -.2, -.4);
+		lineTo(-.2, -.2, -.4);
+		lineTo(.2, -.2, -.4);
+		lineTo(.2, -.2, 0);
+		g.strokeStyle = 'black';
+		g.lineWidth = 20;
+		g.stroke();
+
+		//The persons torso
+		matrix.identity();
+		matrix.perspective(0, 0, 0+0.5*zKeyVal);
+		matrix.rotateY(1);
+		matrix.rotateY(time*click);
+		g.stroke();
+		g.beginPath();
+		matrix.translate(1.0 + xKeyVal/2, 0.4, 0);
+		moveTo(0, 0, 0);
+		lineTo(0, -0.55, 0);
+		g.strokeStyle = 'black';
+		g.lineWidth = 20;
+		g.stroke();
 
 		//The persons arms
 		for (var side = -1 ; side <= 1 ; side += 2) { //For left and right side
@@ -105,13 +214,15 @@ INSERT INFO HERE
 			var angle2 = -0.9 * (-side + Math.sin(rate * time)); //Controls lower arm
 
 			matrix.identity();
+			matrix.perspective(0, 0, 0+0.5*zKeyVal);
+			matrix.rotateY(1);
 			matrix.rotateY(time*click);
 
 			g.lineJoin = 'round';
 			g.lineCap = 'round';
 			g.beginPath();
 
-			matrix.translate(0, .33, 0);
+			matrix.translate(1.0 + xKeyVal/2, .33, 0);
 
 			moveTo( 0, 0, 0);
 			matrix.rotateX(.5 * angle0);
@@ -121,7 +232,7 @@ INSERT INFO HERE
 			lineTo( 0, 0, 0);
 			matrix.rotateX(-.5 * angle0);
 			
-			matrix.rotateZ((-Math.PI/2 + angle1) * side + modClick*15);
+			matrix.rotateZ((-Math.PI/2 + angle1) * side);
 			matrix.translate( .35 * side, 0, 0); //Upper arm
 
 			lineTo( 0, 0, 0);
@@ -140,8 +251,6 @@ INSERT INFO HERE
 			g.strokeStyle = 'black';
 			g.stroke();
 		}
-
-
 		//The persons legs
 		for (var side = -1 ; side <= 1 ; side += 2) { //For left and right side
 			var rate = 1.5 * (2 * Math.PI); //Running rate
@@ -150,19 +259,15 @@ INSERT INFO HERE
 			var angle2 = .7 * (-side + Math.sin(rate * time)); //Controls lower leg
 
 			matrix.identity();
+			matrix.perspective(0, 0, 0+0.5*zKeyVal);
+			matrix.rotateY(1);
 			matrix.rotateY(time*click);
 
 			g.lineJoin = 'round';
 			g.lineCap = 'round';
 			g.beginPath();
 
-
-			//matrix.rotateZ(.5 * angle2 * side);
-			//matrix.translate(0, .1 * side, 0);
-			//lineTo( 0, 0, 0);
-
-			matrix.translate(0, -.18, 0);
-
+			matrix.translate(1.0 + xKeyVal/2, -.18, 0);
 			moveTo( 0, 0, 0);
 			matrix.rotateX(.5 * angle0);
 
@@ -190,6 +295,7 @@ INSERT INFO HERE
 			g.strokeStyle = 'black';
 			g.stroke();
 		}
+
 	}
 </script>
 
