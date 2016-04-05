@@ -1,0 +1,165 @@
+
+<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
+<big>HTML5 Canvas Reference is here</big></a></b>
+
+<p>
+<p>
+
+<center>
+<table>
+<tr>
+<td>
+<center>
+<canvas id=canvas1 width=400 height=400></canvas>
+<p>
+
+<i></i>
+
+</center>
+</td>
+</tr>
+</table>
+<p>
+</center>
+<p>
+
+<script src=utility.js></script>
+<script src=drawlib1.js></script>
+<script src=matrix.js></script>
+
+<script>
+   var canvas;
+
+   var matrix = new Matrix();
+
+   var pt0 = new Vector3(-1, 0, 0);
+   var pt1 = new Vector3( 1, 0, 0);
+   var tmp = new Vector3( 0, 0, 0);
+
+   var pix0 = new Vector3(0, 0, 0);
+   var pix1 = new Vector3(0, 0, 0);
+
+   function moveTo(p) {
+      pt0.set(p[0], p[1], p[2]);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.moveTo(pix0.x, pix0.y);
+   }
+
+   function lineTo(p) {
+      pt0.set(p[0], p[1], p[2]);
+      matrix.transform(pt0, tmp);
+      tmp.viewportTransform(width, height, pix0);
+      g.lineTo(pix0.x, pix0.y);
+   }
+
+   function drawDot(x, y, z) {
+      g.beginPath();
+      moveTo(x, y, z);
+      lineTo(x, y, z + .001);
+      g.stroke();
+   }
+
+   function drawUnitSquare() {
+      g.beginPath();
+      moveTo(-1,-1, 0);
+      lineTo( 1,-1, 0);
+      lineTo( 1, 1, 0);
+      lineTo(-1, 1, 0);
+      lineTo(-1,-1, 0);
+      g.strokeStyle = 'black';
+      g.lineWidth = 16;
+      g.stroke();
+   }
+
+   var g;
+   var width;
+   var height;
+
+   canvas = initCanvas('canvas1');
+   canvas.update = function(_g) {
+      g = _g;
+      width = canvas.width;
+      height = canvas.height;
+
+      // OUTLINE AROUND CANVAS
+
+      g.lineWidth = 2;
+      g.strokeStyle = 'black';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(width, 0);
+      g.lineTo(width, height);
+      g.lineTo(0, height);
+      g.lineTo(0, 0);
+      g.stroke();
+
+      matrix.identity();
+      matrix.scale(.6);
+      matrix.perspective(0, 0, -.1);
+      matrix.rotateY(time);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+
+      function tube(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = 2 * Math.PI * v;
+	 var radius = 1;
+         return [
+	    radius * Math.cos(theta),
+	    radius * Math.sin(theta),
+	    2 * v - 1
+	 ];
+      }
+
+      function globe(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - .5);
+	 var radius = Math.cos(phi);
+	 //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+	 //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [
+	    radius * Math.cos(theta),
+	    radius * Math.sin(theta),
+	    Math.sin(phi)
+	 ];
+      }
+
+      function torus(u, v) {
+         var r = 0.3;
+
+	 r *= 1 + .1 * Math.sin(2 * Math.PI *  7 * (v + .3 * time));
+	 r *= 1 + .1 * Math.sin(2 * Math.PI * 10 * (u + .2 * time));
+
+         var theta = 2 * Math.PI * u;
+         var phi   = 2 * Math.PI * v;
+         return [
+	    Math.cos(theta) * (1 + r * Math.cos(phi)),
+	    Math.sin(theta) * (1 + r * Math.cos(phi)),
+	    r * Math.sin(phi)
+	 ];
+      }
+
+      var nv = 60, nu = 2 * nv;
+
+      g.lineWidth = 1;
+      for (var u = 0 ; u < 1 ; u += 1 / nu)
+      for (var v = 0 ; v < 1 ; v += 1 / nv) {
+/*         
+         var theta = 2 * Math.PI * u;
+         var x = Math.cos(theta);
+	 var y = 2 * v - 1;
+         var z = Math.sin(theta);
+	 drawDot(x, y, z);
+*/
+         g.beginPath();
+	 moveTo(torus(u, v));
+	 lineTo(torus(u + 1 / nu, v));
+	 lineTo(torus(u + 1 / nu, v + 1 / nv));
+	 lineTo(torus(u, v + 1 / nv));
+         g.stroke();
+      }
+   }
+</script>
+
