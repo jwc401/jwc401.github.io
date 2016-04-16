@@ -1,19 +1,15 @@
 
-<b><a href=http://www.w3schools.com/tags/ref_canvas.asp target=1>
-<big>HTML5 Canvas Reference is here</big></a></b>
-
-<p>
-<p>
-
 <center>
 <table>
 <tr>
 <td>
 <center>
-<canvas id=canvas1 width=400 height=400></canvas>
+<canvas id=canvas1 width=800 height=600></canvas>
 <p>
 
-<i></i>
+<i>
+INSERT INFO HERE
+</i>
 
 </center>
 </td>
@@ -94,72 +90,173 @@
       g.lineTo(0, 0);
       g.stroke();
 
+
+      /*
+      function tube(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = 2 * Math.PI * v;
+         var radius = 1;
+         return [
+             radius * Math.cos(theta),
+             radius * Math.sin(theta),
+             2 * v - 1
+         ];
+      }
+
+      function globe(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - .5);
+         var radius = Math.cos(phi);
+         //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [
+            radius * Math.cos(theta),
+            radius * Math.sin(theta),
+            Math.sin(phi)
+         ];
+      }
+
+      function torus(u, v) {
+         var r = 0.3;
+         //r *= 1 + .1 * Math.sin(2 * Math.PI *  7 * (v + .3 * time));  //Causes wave effect
+         //r *= 1 + .1 * Math.sin(2 * Math.PI * 10 * (u + .2 * time));
+         var theta = 2 * Math.PI * u;
+         var phi   = 2 * Math.PI * v;
+         return [
+            Math.cos(theta) * (1 + r * Math.cos(phi)),
+            Math.sin(theta) * (1 + r * Math.cos(phi)),
+            r * Math.sin(phi)
+         ];
+      }
+
+      function cone(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - .5);
+         var radius = Math.cos(phi);
+        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [ radius * Math.sin(theta) ,
+                  radius * Math.cos(theta),
+                  radius
+                ];
+      }
+
+
+      function fan(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - .5);
+         var radius = Math.cos(theta) * Math.sin(phi);
+        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [ radius * Math.cos(theta),
+                  radius * Math.sin(theta) ,
+                  radius
+                ];
+      }
+
+      function spiral(u, v, object) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - .5);
+         var radius = phi * theta / 10;
+        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [ radius * Math.cos(theta) + Math.sin(time),
+                  radius * Math.sin(theta)  + Math.cos(time),
+                  radius 
+                ];
+      }
+      */
+
+      //Object 1
       matrix.identity();
-      matrix.scale(.6);
+      matrix.scale(.2);
       matrix.perspective(0, 0, -.1);
       matrix.rotateY(time);
 
       g.lineJoin = 'round';
       g.lineCap = 'round';
 
-      function tube(u, v) {
+      function torus(u, v) {
+         var r = 0.3;
+         //r *= 1 + .1 * Math.sin(2 * Math.PI *  7 * (v + .3 * time));  //Causes wave effect
+         //r *= 1 + .1 * Math.sin(2 * Math.PI * 10 * (u + .2 * time));
          var theta = 2 * Math.PI * u;
          var phi   = 2 * Math.PI * v;
-	 var radius = 1;
          return [
-	    radius * Math.cos(theta),
-	    radius * Math.sin(theta),
-	    2 * v - 1
-	 ];
+            Math.cos(theta) * (1 + r * Math.cos(phi)),
+            Math.sin(theta) * (1 + r * Math.cos(phi)),
+            r * Math.sin(phi)
+         ];
       }
+
+      var nv = 30, nu = 2 * nv;
+
+      g.lineWidth = 1;
+      for (var u = 0 ; u < 1 ; u += 1 / nu) {
+         for (var v = 0 ; v < 1 ; v += 1 / nv) {
+            /*         
+            var theta = 2 * Math.PI * u;
+            var x = Math.cos(theta);
+   	      var y = 2 * v - 1;
+            var z = Math.sin(theta);
+            drawDot(x, y, z);
+            */
+            g.beginPath();
+            moveTo(torus(u, v));
+            lineTo(torus(u + 1 / nu, v));
+            lineTo(torus(u + 1 / nu, v + 1 / nv));
+            lineTo(torus(u, v + 1 / nv));
+            g.stroke();
+         }
+      }
+
+
+
+      //Object 2
+      matrix.identity();
+      matrix.scale(0.1);
+      matrix.translate(0, 0, 0);
+      matrix.perspective(0, 0, -.1);
+      matrix.rotateY(time);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+
 
       function globe(u, v) {
          var theta = 2 * Math.PI * u;
          var phi   = Math.PI * (v - .5);
-	 var radius = Math.cos(phi);
-	 //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
-	 //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         var radius = Math.cos(phi);
+         //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
          return [
-	    radius * Math.cos(theta),
-	    radius * Math.sin(theta),
-	    Math.sin(phi)
-	 ];
+            radius * Math.cos(theta),
+            radius * Math.sin(theta),
+            Math.sin(phi)
+         ];
       }
 
-      function torus(u, v) {
-         var r = 0.3;
-
-	 r *= 1 + .1 * Math.sin(2 * Math.PI *  7 * (v + .3 * time));
-	 r *= 1 + .1 * Math.sin(2 * Math.PI * 10 * (u + .2 * time));
-
-         var theta = 2 * Math.PI * u;
-         var phi   = 2 * Math.PI * v;
-         return [
-	    Math.cos(theta) * (1 + r * Math.cos(phi)),
-	    Math.sin(theta) * (1 + r * Math.cos(phi)),
-	    r * Math.sin(phi)
-	 ];
-      }
-
-      var nv = 60, nu = 2 * nv;
+      var nv = 30, nu = 2 * nv;
 
       g.lineWidth = 1;
-      for (var u = 0 ; u < 1 ; u += 1 / nu)
-      for (var v = 0 ; v < 1 ; v += 1 / nv) {
-/*         
-         var theta = 2 * Math.PI * u;
-         var x = Math.cos(theta);
-	 var y = 2 * v - 1;
-         var z = Math.sin(theta);
-	 drawDot(x, y, z);
-*/
-         g.beginPath();
-	 moveTo(torus(u, v));
-	 lineTo(torus(u + 1 / nu, v));
-	 lineTo(torus(u + 1 / nu, v + 1 / nv));
-	 lineTo(torus(u, v + 1 / nv));
-         g.stroke();
+      for (var u = 0 ; u < 1 ; u += 1 / nu) {
+         for (var v = 0 ; v < 1 ; v += 1 / nv) {
+            /*         
+            var theta = 2 * Math.PI * u;
+            var x = Math.cos(theta);
+            var y = 2 * v - 1;
+            var z = Math.sin(theta);
+            drawDot(x, y, z);
+            */
+            g.beginPath();
+            moveTo(globe(u, v));
+            lineTo(globe(u + 1 / nu, v));
+            lineTo(globe(u + 1 / nu, v + 1 / nv));
+            lineTo(globe(u, v + 1 / nv));
+            g.stroke();
+         }
       }
+
    }
 </script>
 
