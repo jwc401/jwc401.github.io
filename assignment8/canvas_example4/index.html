@@ -89,6 +89,8 @@ INSERT INFO HERE
       g.lineTo(0, height);
       g.lineTo(0, 0);
       g.stroke();
+      g.fillStyle = "lightblue";
+      g.fill();
 
 
       /*
@@ -133,37 +135,13 @@ INSERT INFO HERE
          var theta = 2 * Math.PI * u;
          var phi   = Math.PI * (v - .5);
          var radius = Math.cos(phi);
-        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
-        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
-         return [ radius * Math.sin(theta) ,
-                  radius * Math.cos(theta),
-                  radius
-                ];
-      }
-
-
-      function fan(u, v) {
-         var theta = 2 * Math.PI * u;
-         var phi   = Math.PI * (v - .5);
-         var radius = Math.cos(theta) * Math.sin(phi);
-        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
-        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
-         return [ radius * Math.cos(theta),
-                  radius * Math.sin(theta) ,
-                  radius
-                ];
-      }
-
-      function spiral(u, v, object) {
-         var theta = 2 * Math.PI * u;
-         var phi   = Math.PI * (v - .5);
-         var radius = phi * theta / 10;
-        //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
-        //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
-         return [ radius * Math.cos(theta) + Math.sin(time),
-                  radius * Math.sin(theta)  + Math.cos(time),
-                  radius 
-                ];
+         //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [ 
+               radius * Math.sin(theta),
+               radius * Math.cos(theta),
+               radius
+         ];
       }
       */
 
@@ -253,6 +231,49 @@ INSERT INFO HERE
             lineTo(globe(u + 1 / nu, v));
             lineTo(globe(u + 1 / nu, v + 1 / nv));
             lineTo(globe(u, v + 1 / nv));
+            g.stroke();
+         }
+      }
+
+      
+      //Object 2
+      matrix.identity();
+      matrix.scale(0.1);
+      matrix.translate(0, -4.0, 0);
+      matrix.perspective(0, 0, -.1);
+      matrix.rotateY(40);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+
+      function tube(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = 2 * Math.PI * v;
+         var radius = 1;
+         return [
+             radius * Math.cos(theta),
+             radius * Math.sin(theta),
+             2 * v - 1
+         ];
+      }
+
+      var nv = 30, nu = 2 * nv;
+
+      g.lineWidth = 1;
+      for (var u = 0 ; u < 1 ; u += 1 / nu) {
+         for (var v = 0 ; v < 1 ; v += 1 / nv) {
+            /*         
+            var theta = 2 * Math.PI * u;
+            var x = Math.cos(theta);
+            var y = 2 * v - 1;
+            var z = Math.sin(theta);
+            drawDot(x, y, z);
+            */
+            g.beginPath();
+            moveTo(cone(u, v));
+            lineTo(cone(u + 1 / nu, v));
+            lineTo(cone(u + 1 / nu, v + 1 / nv));
+            lineTo(cone(u, v + 1 / nv));
             g.stroke();
          }
       }
