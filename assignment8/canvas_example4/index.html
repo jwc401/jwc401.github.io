@@ -301,8 +301,9 @@ INSERT INFO HERE
          var theta = 2 * Math.PI * u;
          var phi   = 2 * Math.PI * v;
          var radius = 1;
-         radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         radius *= 1 + .1 * Math.sin(80 * (v + .3 * time));
          radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         radius *= 1 + .1 * Math.cos(20 * (u + .1 * time));
          return [
              radius * Math.cos(theta),
              radius * Math.sin(theta),
