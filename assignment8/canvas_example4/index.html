@@ -131,7 +131,7 @@ INSERT INFO HERE
          ];
       }
 
-      function cone(u, v) {
+      function hourglass(u, v) {
          var theta = 2 * Math.PI * u;
          var phi   = Math.PI * (v - .5);
          var radius = Math.cos(phi);
@@ -144,6 +144,54 @@ INSERT INFO HERE
          ];
       }
       */
+
+
+            //Object 3
+      matrix.identity();
+      matrix.scale(0.2);
+      matrix.translate(0, -2.0, 0);
+      matrix.perspective(0, 0, -.1);
+      //matrix.rotateY(time);
+      matrix.rotateX(90);
+
+      g.lineJoin = 'round';
+      g.lineCap = 'round';
+
+      function hourglass(u, v) {
+         var theta = 2 * Math.PI * u;
+         var phi   = Math.PI * (v - 1.0);
+         var radius = Math.cos(phi);
+         //radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         //radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
+         return [ 
+               radius * Math.sin(theta),
+               radius * Math.cos(theta),
+               radius
+         ];
+      }
+
+      var nv = 30, nu = 2 * nv;
+
+      g.lineWidth = 1;
+      for (var u = 0 ; u < 1 ; u += 1 / nu) {
+         for (var v = 0 ; v < 1 ; v += 1 / nv) {
+            /*         
+            var theta = 2 * Math.PI * u;
+            var x = Math.cos(theta);
+            var y = 2 * v - 1;
+            var z = Math.sin(theta);
+            drawDot(x, y, z);
+            */
+            g.beginPath();
+            moveTo(hourglass(u, v));
+            lineTo(hourglass(u + 1 / nu, v));
+            lineTo(hourglass(u + 1 / nu, v + 1 / nv));
+            lineTo(hourglass(u, v + 1 / nv));
+            g.strokeStyle = "yellow";
+            g.stroke();
+         }
+      }
+
 
       //Object 1
       matrix.identity();
@@ -184,6 +232,7 @@ INSERT INFO HERE
             lineTo(torus(u + 1 / nu, v));
             lineTo(torus(u + 1 / nu, v + 1 / nv));
             lineTo(torus(u, v + 1 / nv));
+            g.strokeStyle = "black";
             g.stroke();
          }
       }
@@ -236,47 +285,45 @@ INSERT INFO HERE
       }
 
       
-      //Object 2
+
+      //Object 4
       matrix.identity();
-      matrix.scale(0.1);
-      matrix.translate(0, -4.0, 0);
+      matrix.scale(0.15);
+      matrix.translate(0, 3.5, 0);
       matrix.perspective(0, 0, -.1);
-      matrix.rotateY(40);
+      matrix.rotateY(2.0 * Math.cos(time));
+      matrix.rotateX(2.0 * Math.sin(time));
 
       g.lineJoin = 'round';
       g.lineCap = 'round';
-
+      
       function tube(u, v) {
          var theta = 2 * Math.PI * u;
          var phi   = 2 * Math.PI * v;
          var radius = 1;
+         radius *= 1 + .1 * Math.sin(30 * (v + .3 * time));
+         radius *= 1 + .1 * Math.sin(40 * (u + .2 * time));
          return [
              radius * Math.cos(theta),
              radius * Math.sin(theta),
              2 * v - 1
          ];
       }
-
       var nv = 30, nu = 2 * nv;
 
-      g.lineWidth = 1;
+      g.lineWidth = 1*Math.tan(time);
       for (var u = 0 ; u < 1 ; u += 1 / nu) {
          for (var v = 0 ; v < 1 ; v += 1 / nv) {
-            /*         
-            var theta = 2 * Math.PI * u;
-            var x = Math.cos(theta);
-            var y = 2 * v - 1;
-            var z = Math.sin(theta);
-            drawDot(x, y, z);
-            */
             g.beginPath();
-            moveTo(cone(u, v));
-            lineTo(cone(u + 1 / nu, v));
-            lineTo(cone(u + 1 / nu, v + 1 / nv));
-            lineTo(cone(u, v + 1 / nv));
+            moveTo(tube(u, v));
+            lineTo(tube(u + 2 / nu, v));
+            lineTo(tube(u + 2 / nu, v + 2 / nv));
+            lineTo(tube(u, v + 2 / nv));
+            g.strokeStyle = "red";
             g.stroke();
          }
       }
+
 
    }
 </script>
