@@ -2,9 +2,15 @@
 
 <body bgcolor=white>
 <center>
-<canvas id='canvas1' width='480' height='480'></canvas>
+<canvas id='canvas1' width='800' height='600'></canvas>
 </center>
 </body>
+
+<i>
+<center>
+Isn't it hypnotising? Just watch the hand and let your worries fade away...
+</center>
+</i>
 
 <script>
 
@@ -132,13 +138,12 @@
 
 
 
-      root.identity().scale(.8);
+      root.identity().scale(.4);
 
-      root.rotateY(Math.sin(getTime()));
+      //root.rotateY(Math.sin(getTime()));
 
-
+      root.translate(Math.sin(getTime()), Math.cos(getTime())+0.5, 0);
       indexJoint1.identity().rotateY(PI/3);
-      //indexJoint.identity().rotateX(-PI*getTime());
 
       
 
