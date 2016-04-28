@@ -9,6 +9,29 @@ Matrix.prototype = {
 
    //////////////////////// PUBLIC METHODS ////////////////////////////
 
+
+   //Hermite
+   hermite : function (a,b,c,d){ //Expression of A (2t3 - 3t2 + 1) + B (-2t3 + 3t2) + C (t3 - 3t2 + t) + D (t3 - t2)
+      var valA = 2*a + -2*b + 1*c + 1*d; //A = 2*A -2*B + C + D
+      var valB = -3*a + 3*b + -2*c + -1*d; //B = -3*A + 3*B -2*C -D
+      var valC = c; //C = C 
+      var valD = a; //D = A
+      var hermiteVals = [valA, valB, valC, valD];
+      return hermiteVals;
+   },
+
+
+   //Bezier
+   bezier : function (a,b,c,d){
+      var valA = -1*a + 3*b + -3*c + 1*d; //A = -1*A + 3*B - 3*C + D
+      var valB = 3*a + -6*b + 3*c; //B = 3*A - 6*B + 3*C;
+      var valC = -3*a + 3*b; //C = -3*A + 3*B
+      var valD = a; //D = A
+      var bezierVals = [valA, valB, valC, valD];
+      return bezierVals;
+   },
+
+
    toGPUMatrix : function(dst) {
       var row, col;
       for (row = 0 ; row < 4 ; row++)
