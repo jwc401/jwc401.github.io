@@ -7,6 +7,7 @@
 </body>
 
 <script>
+
    function getTime() { return (new Date()).getTime() / 1000; }
 
    var scene = new CT.Scene(canvas1);
@@ -15,33 +16,134 @@
 
    var root = new CT.Node();
    scene.add(root);
-/*
-   root.addChild(new CT.Torus(32, 16, .6));
-*/
-   //var shape1 = root.addChild(new CT.Cube());
-   var shape1 = root.addChild(new CT.Torus(32,16,.6));
-   shape1.translate(1,0,0).scale([1,.3,.3]);
-   shape1.setMetal(1,1,0);
 
-   var joint = root.addChild(new CT.Node());
-   var shape2 = joint.addChild(new CT.Cylinder());
+   var PI = Math.PI;
+
+
+   //Forearm
+   var foreArmNode = root.addChild(new CT.Node());
+   foreArmNode.translate(0,-1.0,0).scale(.3);
+   var foreArmJoint = foreArmNode.addChild(new CT.Sphere(32, 16));
+   foreArmJoint.scale(0.4);
+   var foreArmBone = foreArmNode.addChild(new CT.Cylinder(16));
+   foreArmBone.rotateX(-PI/2).scale([0.4,0.4,0.8]).translate(0, 0, 1);
+
+   //Wrist
+   var wristJoint = foreArmNode.addChild(new CT.Node());
+   wristJoint.translate(0, 0.8 * 2, 0);
+   var wristBall = wristJoint.addChild(new CT.Sphere(32,16));
+   wristBall.scale(0.8);
+
+
+   //Thumb
+   var thumbJoint = wristJoint.addChild(new CT.Node());
+   thumbJoint.translate(1.5,0.3,0);
+   var thumb = thumbJoint.addChild(new CT.Cylinder(16));
+   thumb.rotateX(PI/2).rotateY(PI/2).scale([0.2,0.2,0.4]).translate(0, 0, -1.4);
+   var thumbJointP0 = thumbJoint.addChild(new CT.Sphere(32, 16));
+   thumbJointP0.scale(0.25);
+
+   var thumbJoint1 = thumbJoint.addChild(new CT.Node());
+   thumbJoint1.translate(0,0,0);
+   var thumbJointP1 = thumbJoint1.addChild(new CT.Sphere(32, 16));
+   thumbJointP1.translate(0,1.0,0).scale(0.2);
+   var thumb1 = thumbJoint1.addChild(new CT.Cylinder(16));
+   thumb1.rotateX(PI/2).scale([0.2,0.2,0.4]).translate(0, 0, -1.4);
+   
+
+
+   //Index Finger
+   var indexJoint = wristJoint.addChild(new CT.Node());
+   indexJoint.translate(0.6,0.3,0);
+   var index = indexJoint.addChild(new CT.Cylinder(16));
+   index.rotateX(PI/2).scale([0.2,0.2,0.4]).translate(0, 0, -1.4);
+   var indexJointP0 = indexJoint.addChild(new CT.Sphere(32, 16));
+   indexJointP0.scale(0.25);
+
+   var indexJoint1 = indexJoint.addChild(new CT.Node());
+   indexJoint1.translate(0,0,0);
+   var indexJointP1 = indexJoint1.addChild(new CT.Sphere(32, 16));
+   indexJointP1.translate(0,1.0,0).scale(0.2);
+   var index1 = indexJointP1.addChild(new CT.Cylinder(32));
+   index1.rotateX(PI/2).scale([1,1,2]).translate(0, 0, -1.2);
+   var indexJointP2 = index1.addChild(new CT.Sphere(32, 16));
+   indexJointP2.translate(0,0,-1);
+
+
+   //Middle finger
+   var middleJoint = wristJoint.addChild(new CT.Node());
+   middleJoint.translate(0.1,0.3,0);
+   var middle = middleJoint.addChild(new CT.Cylinder(16));
+   middle.rotateX(PI/2).scale([0.2,0.2,0.45]).translate(0, 0, -1.4);
+   var middleJoint0 = middleJoint.addChild(new CT.Sphere(32, 16));
+   middleJoint0.scale(0.25);
+
+   var middleJoint1 = middleJoint.addChild(new CT.Node());
+   middleJoint1.translate(0,0,0);
+   var middleJointP1 = middleJoint1.addChild(new CT.Sphere(32, 16));
+   middleJointP1.translate(0,1.0,0).scale(0.2);
+   var middle1 = middleJointP1.addChild(new CT.Cylinder(32));
+   middle1.rotateX(PI/2).scale([1,1,2.5]).translate(0, 0, -1.2);
+   var middleJointP2 = middle1.addChild(new CT.Sphere(32, 16));
+   middleJointP2.translate(0,0,-1);
+
+   //Ring finger
+   var ringJoint = wristJoint.addChild(new CT.Node());
+   ringJoint.translate(-0.4,0.3,0);
+   var ring = ringJoint.addChild(new CT.Cylinder(16));
+   ring.rotateX(PI/2).scale([0.2,0.2,0.4]).translate(0, 0, -1.4);
+   var ringJoint0 = ringJoint.addChild(new CT.Sphere(32, 16));
+   ringJoint0.scale(0.25);
+
+   var ringJoint1 = ringJoint.addChild(new CT.Node());
+   ringJoint1.translate(0,0,0);
+   var ringJoint1P1 = ringJoint1.addChild(new CT.Sphere(32, 16));
+   ringJoint1P1.translate(0,1.0,0).scale(0.2);
+   var ring1 = ringJoint1P1.addChild(new CT.Cylinder(32));
+   ring1.rotateX(PI/2).scale([1,1,1.8]).translate(0, 0, -1.2);
+   var ringJoint1P2 = ring1.addChild(new CT.Sphere(32, 16));
+   ringJoint1P2.translate(0,0,-1);
+
+
+   //Little finger
+   var littleJoint = wristJoint.addChild(new CT.Node());
+   littleJoint.translate(-0.9,0.2,0);
+   var little = littleJoint.addChild(new CT.Cylinder(16));
+   little.rotateX(PI/2).scale([0.2,0.2,0.3]).translate(0, 0, -1.4);
+   var littleJoint0 = littleJoint.addChild(new CT.Sphere(32, 16));
+   littleJoint0.scale(0.25).translate(0,0,0);
+
+   var littleJoint1 = littleJoint.addChild(new CT.Node());
+   littleJoint1.translate(0,-0.3,0);
+   var littleJointP1 = littleJoint1.addChild(new CT.Sphere(32, 16));
+   littleJointP1.translate(0,1.0,0).scale(0.2);
+   var little1 = littleJointP1.addChild(new CT.Cylinder(32));
+   little1.rotateX(PI/2).scale([1,1,1.5]).translate(0, 0, -1.2);
+   var littleJointP2 = little1.addChild(new CT.Sphere(32, 16));
+   littleJointP2.translate(0,0,-1);
+
+
+
 
    var startTime = getTime();
+
    (function update() {
       CT.time = getTime() - startTime;
-/*
-      root.identity().rotateY(CT.time).scale(.3);
-*/
-      root.identity().rotateY(Math.sin(CT.time))
-		     .translate(-.5,0,0).rotateZ(Math.cos(CT.time)).scale(.3);
 
-      joint.identity().translate(2,0,0).rotateZ(Math.sin(CT.time));
-      shape2.identity().translate(1,0,0).scale([1,.3,.3]).rotateY(Math.PI/2);
-      shape2.setPhong([.1,0,0, .5,0,.5+.5*Math.sin(10*CT.time), .5,.5,5,10]);
+
+
+      root.identity().scale(.8);
+
+      root.rotateY(Math.sin(getTime()));
+
+
+      indexJoint1.identity().rotateY(PI/3);
+      //indexJoint.identity().rotateX(-PI*getTime());
+
+      
 
       root.draw();
-
-      setTimeout(update, 1000 / 60);
+      setTimeout(update, 1000 / 105);
    })();
 </script>
 
