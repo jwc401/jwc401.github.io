@@ -22,7 +22,7 @@ Matrix.prototype = {
 
 
    //Bezier
-   bezier : function (a,b,c,d){
+   bezier : function (a,b,c,d){ //(-A + 3B - 3C + D) t3 + (3A - 6B + 3C) t2 + (-3A + 3B) t + D
       var valA = -1*a + 3*b + -3*c + 1*d; //A = -1*A + 3*B - 3*C + D
       var valB = 3*a + -6*b + 3*c; //B = 3*A - 6*B + 3*C;
       var valC = -3*a + 3*b; //C = -3*A + 3*B
